@@ -24,6 +24,7 @@ import { SuccessStep } from "@/components/steps/SuccessStep";
 import { ErrorStep } from "@/components/steps/ErrorStep";
 import { Instructions } from "@/components/instructions/Instructions";
 import { PromoCodeStep } from "@/components/steps/PromoCodeStep";
+import { AccountStep } from "@/components/steps/AccountStep";
 
 export default function Home() {
   // State
@@ -84,7 +85,7 @@ export default function Home() {
   };
 
   const handleBack = () => {
-    if (step === "subscriptions" || step === "instructions" || step === "promo") {
+    if (step === "subscriptions" || step === "instructions" || step === "promo" || step === "account") {
       setStep("info"); // Возвращаемся на информационный экран
       setShowPlans(false);
       setIsRenewal(false); // Сбрасываем флаг продления
@@ -152,8 +153,8 @@ export default function Home() {
   };
 
   const handleAvatarClick = () => {
-    // Переход в раздел промокода (личный кабинет)
-    setStep("promo");
+    // Переход в личный кабинет
+    setStep("account");
     if (typeof window !== "undefined") {
       window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
     }
@@ -275,7 +276,7 @@ export default function Home() {
             user={user}
             tgUser={tgUser}
             onBack={handleBack}
-            showBack={step === "payment" || step === "error" || step === "subscriptions" || step === "instructions" || step === "plans" || step === "promo"}
+            showBack={step === "payment" || step === "error" || step === "subscriptions" || step === "instructions" || step === "plans" || step === "promo" || step === "account"}
             onSubscriptionsClick={handleSubscriptionsClick}
             onLogoClick={handleLogoClick}
             onAvatarClick={handleAvatarClick}
@@ -311,12 +312,34 @@ export default function Home() {
                 </div>
               )}
 
+              {step === "account" && (
+                <div className="animate-in fade-in slide-in-from-right duration-300">
+                  <AccountStep
+                    user={user}
+                    tgUser={tgUser}
+                    onSubscriptionsClick={handleSubscriptionsClick}
+                    onPromoClick={() => {
+                      setStep("promo");
+                      if (typeof window !== "undefined") {
+                        window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
+                      }
+                    }}
+                    onBack={handleBack}
+                  />
+                </div>
+              )}
+
               {step === "promo" && (
                 <div className="animate-in fade-in slide-in-from-right duration-300">
                   <PromoCodeStep
                     tgUser={tgUser}
                     onActivate={handleActivatePromo}
-                    onBack={handleBack}
+                    onBack={() => {
+                      setStep("account");
+                      if (typeof window !== "undefined") {
+                        window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
+                      }
+                    }}
                   />
                 </div>
               )}
