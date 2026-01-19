@@ -203,32 +203,26 @@ export default function Home() {
       }
     }
 
-    // Метод 4: Создание видимого элемента <a> с user interaction
+    // Метод 4: Создание видимого элемента <a> с прямым кликом
     if (!opened) {
       try {
         const link = document.createElement("a");
         link.href = happLink;
         link.style.display = "block";
-        link.style.position = "absolute";
+        link.style.position = "fixed";
         link.style.left = "50%";
         link.style.top = "50%";
         link.style.transform = "translate(-50%, -50%)";
-        link.style.width = "200px";
-        link.style.height = "50px";
+        link.style.width = "1px";
+        link.style.height = "1px";
         link.style.background = "transparent";
         link.style.zIndex = "99999";
-        link.style.opacity = "0.01";
+        link.style.opacity = "0";
+        link.style.pointerEvents = "auto";
         
         document.body.appendChild(link);
         
-        // Создаем событие клика с user gesture
-        const touchEvent = new TouchEvent("touchstart", {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-        } as any);
-        
-        link.dispatchEvent(touchEvent);
+        // Прямой клик
         link.click();
         
         setTimeout(() => {
@@ -239,6 +233,16 @@ export default function Home() {
         opened = true;
       } catch (e) {
         console.log("Method 4 (visible link) failed:", e);
+      }
+    }
+
+    // Метод 5: Попытка через location.assign
+    if (!opened) {
+      try {
+        window.location.assign(happLink);
+        opened = true;
+      } catch (e) {
+        console.log("Method 5 (location.assign) failed:", e);
       }
     }
 
