@@ -36,11 +36,11 @@ export interface UserAccount {
   subscriptions: Subscription[];
 }
 
-export type Step = "loading" | "info" | "plans" | "subscriptions" | "instructions" | "payment" | "processing" | "success" | "error" | "promo" | "account";
+export type Step = "loading" | "info" | "plans" | "subscriptions" | "instructions" | "payment" | "processing" | "success" | "error" | "account";
 
 export type DeviceType = "ios" | "android" | "android-tv" | "windows" | "macos";
 
-// Типы промокодов
+x// Типы промокодов
 export type PromoCodeType = "referral" | "admin_balance" | "admin_days";
 export type PromoCategory = "money" | "days" | "referral";
 export type RewardType = "balance" | "subscription";

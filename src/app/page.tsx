@@ -84,7 +84,7 @@ export default function Home() {
   };
 
   const handleBack = () => {
-    if (step === "subscriptions" || step === "instructions" || step === "promo" || step === "account") {
+    if (step === "subscriptions" || step === "instructions" || step === "account") {
       setStep("info"); // Возвращаемся на информационный экран
       setShowPlans(false);
       setIsRenewal(false); // Сбрасываем флаг продления
@@ -286,7 +286,7 @@ export default function Home() {
             user={user}
             tgUser={tgUser}
             onBack={handleBack}
-            showBack={step === "payment" || step === "error" || step === "subscriptions" || step === "instructions" || step === "plans" || step === "promo" || step === "account"}
+            showBack={step === "payment" || step === "error" || step === "subscriptions" || step === "instructions" || step === "plans" || step === "account"}
             onSubscriptionsClick={handleSubscriptionsClick}
             onLogoClick={handleLogoClick}
             onAvatarClick={handleAvatarClick}
