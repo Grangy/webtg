@@ -1,7 +1,14 @@
 // MaxGroot API Client
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
-const API_SECRET = process.env.API_SECRET || "[REDACTED]";
+
+function getApiSecret(): string {
+  const secret = process.env.API_SECRET;
+  if (!secret) {
+    throw new Error("API_SECRET environment variable is required");
+  }
+  return secret;
+}
 
 interface ApiResponse<T> {
   ok: boolean;
@@ -75,7 +82,7 @@ async function apiRequest<T>(
   const url = `${API_URL}${endpoint}`;
   
   const headers: Record<string, string> = {
-    "X-Webapp-Secret": API_SECRET,
+    "X-Webapp-Secret": getApiSecret(),
   };
 
   if (options.body) {

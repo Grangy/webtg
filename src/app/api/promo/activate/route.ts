@@ -1,12 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
-const API_SECRET = process.env.API_SECRET || "[REDACTED]";
+
+function getApiSecret(): string {
+  const secret = process.env.API_SECRET;
+  if (!secret) {
+    throw new Error("API_SECRET environment variable is required");
+  }
+  return secret;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { telegramId, code } = body;
+    const API_SECRET = getApiSecret();
 
     console.log("Promo activate request:", { telegramId, code, API_URL, hasSecret: !!API_SECRET });
 

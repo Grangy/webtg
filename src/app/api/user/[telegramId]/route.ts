@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
-const API_SECRET = process.env.API_SECRET || "[REDACTED]";
+
+function getApiSecret(): string {
+  const secret = process.env.API_SECRET;
+  if (!secret) {
+    throw new Error("API_SECRET environment variable is required");
+  }
+  return secret;
+}
 
 // Моковые данные для тестирования (временно)
 const USE_MOCK_DATA = false; // Переключи на false для реального API
@@ -25,6 +32,7 @@ export async function GET(
   { params }: { params: Promise<{ telegramId: string }> }
 ) {
   const { telegramId } = await params;
+  const API_SECRET = getApiSecret();
 
   console.log("API /user/[telegramId] called:", {
     telegramId,

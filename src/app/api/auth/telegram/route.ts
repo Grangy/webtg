@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
 
     const botToken = process.env.BOT_TOKEN;
 
-    if (!botToken || botToken === "your_bot_token_here") {
+    if (!botToken) {
       // В режиме разработки без токена — показываем данные без проверки
       console.warn("⚠️ BOT_TOKEN not configured, skipping validation");
       

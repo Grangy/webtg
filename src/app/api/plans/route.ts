@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
-const API_SECRET = process.env.API_SECRET || "[REDACTED]";
+
+function getApiSecret(): string {
+  const secret = process.env.API_SECRET;
+  if (!secret) {
+    throw new Error("API_SECRET environment variable is required");
+  }
+  return secret;
+}
 
 export async function GET() {
   try {
+    const API_SECRET = getApiSecret();
     const response = await fetch(`${API_URL}/plans`, {
       headers: {
         "X-Webapp-Secret": API_SECRET,
