@@ -40,7 +40,7 @@ export type Step = "loading" | "info" | "plans" | "subscriptions" | "instruction
 
 export type DeviceType = "ios" | "android" | "android-tv" | "windows" | "macos";
 
-x// Типы промокодов
+// Типы промокодов
 export type PromoCodeType = "referral" | "admin_balance" | "admin_days";
 export type PromoCategory = "money" | "days" | "referral";
 export type RewardType = "balance" | "subscription";
