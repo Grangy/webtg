@@ -151,123 +151,46 @@ export default function Home() {
     
     if (typeof window === "undefined") return;
 
-    // Telegram WebApp блокирует кастомные протоколы (happ://)
-    // Пробуем несколько методов для максимальной совместимости
-    let opened = false;
-
-    // Метод 1: Использование iframe (работает в некоторых браузерах)
+    // Используем простой подход с <a> элементом как в рабочем примере
+    // Это самый надежный способ для открытия кастомных протоколов
     try {
-      const iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.src = happLink;
-      document.body.appendChild(iframe);
+      const link = document.createElement("a");
+      link.href = happLink;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.style.display = "none";
       
+      document.body.appendChild(link);
+      
+      // Кликаем программно
+      link.click();
+      
+      // Удаляем элемент после небольшой задержки
       setTimeout(() => {
-        if (document.body.contains(iframe)) {
-          document.body.removeChild(iframe);
+        if (document.body.contains(link)) {
+          document.body.removeChild(link);
         }
-      }, 2000);
-      opened = true;
-    } catch (e) {
-      console.log("Method 1 (iframe) failed:", e);
-    }
-
-    // Метод 2: window.open (может работать в некоторых случаях)
-    if (!opened) {
-      try {
-        const newWindow = window.open(happLink, "_blank");
-        if (newWindow) {
-          opened = true;
-          setTimeout(() => {
-            try {
-              newWindow.close();
-            } catch (e) {
-              // Игнорируем ошибки закрытия
-            }
-          }, 100);
-        }
-      } catch (e) {
-        console.log("Method 2 (window.open) failed:", e);
+      }, 100);
+      
+      // Haptic feedback
+      if (window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
       }
-    }
-
-    // Метод 3: location.replace (для некоторых браузеров)
-    if (!opened) {
-      try {
-        window.location.replace(happLink);
-        opened = true;
-      } catch (e) {
-        console.log("Method 3 (location.replace) failed:", e);
-      }
-    }
-
-    // Метод 4: Создание видимого элемента <a> с прямым кликом
-    if (!opened) {
-      try {
-        const link = document.createElement("a");
-        link.href = happLink;
-        link.style.display = "block";
-        link.style.position = "fixed";
-        link.style.left = "50%";
-        link.style.top = "50%";
-        link.style.transform = "translate(-50%, -50%)";
-        link.style.width = "1px";
-        link.style.height = "1px";
-        link.style.background = "transparent";
-        link.style.zIndex = "99999";
-        link.style.opacity = "0";
-        link.style.pointerEvents = "auto";
-        
-        document.body.appendChild(link);
-        
-        // Прямой клик
-        link.click();
-        
-        setTimeout(() => {
-          if (document.body.contains(link)) {
-            document.body.removeChild(link);
-          }
-        }, 1000);
-        opened = true;
-      } catch (e) {
-        console.log("Method 4 (visible link) failed:", e);
-      }
-    }
-
-    // Метод 5: Попытка через location.assign
-    if (!opened) {
-      try {
-        window.location.assign(happLink);
-        opened = true;
-      } catch (e) {
-        console.log("Method 5 (location.assign) failed:", e);
-      }
-    }
-
-    // Haptic feedback
-    if (window.Telegram?.WebApp?.HapticFeedback) {
-      window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
-    }
-
-    // Всегда копируем ссылку в буфер обмена как fallback
-    copyToClipboard(happLink);
-
-    // Показываем уведомление
-    setTimeout(() => {
+      
+      // Копируем ссылку в буфер обмена как fallback
+      copyToClipboard(happLink);
+      
+    } catch (error) {
+      console.warn("Failed to open Happ link:", error);
+      // Fallback: просто копируем в буфер обмена
+      copyToClipboard(happLink);
+      
       if (window.Telegram?.WebApp) {
-        if (opened) {
-          window.Telegram.WebApp.showAlert(
-            "Попытка открыть приложение...\n\nЕсли приложение не открылось, ссылка скопирована в буфер обмена."
-          );
-        } else {
-          window.Telegram.WebApp.showAlert(
-            "Ссылка скопирована в буфер обмена.\n\nВставьте её в приложение Happ для подключения VPN."
-          );
-        }
+        window.Telegram.WebApp.showAlert(
+          "Ссылка скопирована в буфер обмена.\n\nВставьте её в приложение Happ для подключения VPN."
+        );
       }
-    }, 300);
+    }
   };
 
   const handleBackToPlans = () => {
@@ -407,6 +330,7 @@ export default function Home() {
                     onOpenHappLink={openSubscriptionLink}
                     onBack={handleBackToPlans}
                     onInstructionsClick={handleInstructionsClick}
+                    isRenewal={isRenewal}
                   />
                 </div>
               )}
