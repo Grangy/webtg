@@ -1,36 +1,168 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MaxGroot VPN — Telegram Mini App
 
-## Getting Started
+Telegram Mini App для продажи VPN подписок с интеграцией MaxGroot VPN API.
 
-First, run the development server:
+## 🚀 Возможности
+
+- ✅ Выбор тарифов (1, 3, 6, 12 месяцев)
+- ✅ Оплата через СБП (Platega) или с баланса
+- ✅ Управление подписками
+- ✅ Продление подписок
+- ✅ Поэтапная инструкция по подключению для всех устройств
+- ✅ Поддержка iOS, macOS, Android, Android TV, Windows
+- ✅ Интеграция с Happ VPN клиентом
+
+## 📋 Требования
+
+- Node.js 18+ 
+- npm или yarn
+- Telegram Bot Token (от @BotFather)
+- Доступ к MaxGroot VPN API
+
+## 🔧 Установка
+
+### 1. Клонируйте репозиторий
+
+```bash
+git clone https://github.com/Grangy/webtg.git
+cd webtg
+```
+
+### 2. Установите зависимости
+
+```bash
+npm install
+```
+
+### 3. Настройте переменные окружения
+
+Скопируйте `.env.example` в `.env.local`:
+
+```bash
+cp .env.example .env.local
+```
+
+Отредактируйте `.env.local` и укажите:
+
+```env
+BOT_TOKEN=your_bot_token_here
+API_URL=https://grangy.ru/api
+API_SECRET=your_api_secret_here
+```
+
+### 4. Запустите в режиме разработки
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Приложение будет доступно на `http://localhost:3000`
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🌐 Продакшен деплой
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Для web.grangy.ru
 
-## Learn More
+1. **Настройте переменные окружения на сервере:**
+   ```env
+   BOT_TOKEN=your_bot_token
+   API_URL=https://grangy.ru/api
+   API_SECRET=your_api_secret
+   NEXT_PUBLIC_APP_URL=https://web.grangy.ru
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+2. **Соберите проект:**
+   ```bash
+   npm run build
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Запустите продакшен сервер:**
+   ```bash
+   npm start
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Настройте Telegram Bot:**
+   - Откройте [@BotFather](https://t.me/BotFather)
+   - Используйте `/setmenubutton` или настройте через Bot Settings
+   - Укажите URL: `https://web.grangy.ru`
 
-## Deploy on Vercel
+### Docker (опционально)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```dockerfile
+FROM node:18-alpine AS base
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+CMD ["npm", "start"]
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📁 Структура проекта
+
+```
+src/
+├── app/
+│   ├── api/              # API routes (прокси к MaxGroot API)
+│   ├── layout.tsx        # Root layout
+│   └── page.tsx          # Главная страница
+├── components/
+│   ├── layout/           # Header, StepIndicator
+│   ├── steps/            # Шаги приложения (Info, Plans, Payment, Success)
+│   ├── plans/            # Компоненты планов
+│   ├── subscriptions/    # Компоненты подписок
+│   ├── setup/            # SetupWizard для настройки подключения
+│   ├── instructions/     # Инструкции по подключению
+│   └── ui/               # UI компоненты
+├── hooks/                # Custom hooks
+├── lib/                  # API клиент и утилиты
+├── types/                # TypeScript типы
+└── utils/                # Утилиты форматирования
+```
+
+## 🔐 Безопасность
+
+- ✅ Все API запросы проходят через серверные routes (не напрямую с клиента)
+- ✅ Telegram `initData` проверяется на сервере
+- ✅ Секретные ключи хранятся только в `.env.local` (не коммитятся)
+- ✅ Используются security headers
+
+## 📚 API Endpoints
+
+Все endpoints проксируются через Next.js API routes:
+
+- `/api/user/[telegramId]` - данные пользователя
+- `/api/user/[telegramId]/subscriptions` - подписки
+- `/api/user/[telegramId]/balance` - баланс
+- `/api/plans` - доступные тарифы
+- `/api/subscription/buy` - покупка подписки
+- `/api/topup/create` - создание платежа
+- `/api/topup/[orderId]/status` - статус платежа
+
+## 🛠️ Разработка
+
+### Запуск в dev режиме
+
+```bash
+npm run dev
+```
+
+### Сборка для продакшена
+
+```bash
+npm run build
+npm start
+```
+
+### Линтинг
+
+```bash
+npm run lint
+```
+
+## 📝 Лицензия
+
+Private — не для публичного использования
+
+## 🤝 Поддержка
+
+Для вопросов и поддержки обращайтесь к команде MaxGroot.
