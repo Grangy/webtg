@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { UserAccount, UserData } from "@/types";
+import { UserAccount, UserData, UserPromoInfo, PromoActivationData } from "@/types";
 import { formatDate } from "@/utils/formatters";
 
 interface Topup {
@@ -17,7 +17,7 @@ interface AccountStepProps {
   user: UserAccount | null;
   tgUser: UserData | null;
   onSubscriptionsClick: () => void;
-  onActivatePromo: (code: string) => Promise<{ ok: boolean; message?: string; error?: string }>;
+  onActivatePromo: (code: string) => Promise<{ ok: boolean; message?: string; error?: string; data?: PromoActivationData }>;
   onBack: () => void;
   onUserDataUpdate?: () => void;
 }
@@ -35,11 +35,14 @@ export function AccountStep({
   const [error, setError] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
-  const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string; details?: PromoActivationData } | null>(null);
+  const [userPromoInfo, setUserPromoInfo] = useState<UserPromoInfo | null>(null);
+  const [loadingPromoInfo, setLoadingPromoInfo] = useState(true);
 
   useEffect(() => {
     if (!tgUser) {
       setLoading(false);
+      setLoadingPromoInfo(false);
       return;
     }
 
@@ -62,7 +65,24 @@ export function AccountStep({
       }
     };
 
+    const loadUserPromoInfo = async () => {
+      try {
+        setLoadingPromoInfo(true);
+        const response = await fetch(`/api/user/${tgUser.id}/promo`);
+        const data = await response.json();
+
+        if (data.ok && data.data) {
+          setUserPromoInfo(data.data);
+        }
+      } catch (err) {
+        console.error("Error loading user promo info:", err);
+      } finally {
+        setLoadingPromoInfo(false);
+      }
+    };
+
     loadTopups();
+    loadUserPromoInfo();
   }, [tgUser]);
 
   const getStatusColor = (status: string) => {
@@ -106,12 +126,41 @@ export function AccountStep({
       const result = await onActivatePromo(promoCode.trim().toUpperCase());
       
       if (result.ok) {
-        setPromoMessage({ type: "success", text: result.message || "Промокод успешно активирован!" });
+        // Формируем детальное сообщение на основе типа промокода
+        let successMessage = result.message || "Промокод успешно активирован!";
+        
+        if (result.data) {
+          const { promoType, promoCategory, reward, balance, subscription } = result.data;
+          
+          // Дополнительная информация о награде
+          if (promoCategory === "money" && reward.amount) {
+            successMessage = `💵 Начислено: ${reward.amount} ₽\n${balance ? `💳 Баланс: ${balance.current} ₽` : ""}`;
+          } else if (promoCategory === "days" && reward.days) {
+            successMessage = `✅ Вам начислена подписка на ${reward.days} дней`;
+          } else if (promoCategory === "referral" && reward.days) {
+            successMessage = `🎁 Вы получили VPN на ${reward.days} дня!\n💰 Ваш друг получит 20% от ваших пополнений`;
+          }
+        }
+        
+        setPromoMessage({ 
+          type: "success", 
+          text: successMessage,
+          details: result.data
+        });
         setPromoCode("");
         
-        // Обновляем данные пользователя после успешной активации
+        // Обновляем данные пользователя и информацию о промокоде
         if (onUserDataUpdate) {
           onUserDataUpdate();
+        }
+        
+        // Перезагружаем информацию о промокоде пользователя
+        if (tgUser) {
+          const response = await fetch(`/api/user/${tgUser.id}/promo`);
+          const data = await response.json();
+          if (data.ok && data.data) {
+            setUserPromoInfo(data.data);
+          }
         }
         
         // Haptic feedback
@@ -193,7 +242,57 @@ export function AccountStep({
         </button>
       </div>
 
-      {/* Promo Code Section */}
+      {/* My Referral Promo Code */}
+      {loadingPromoInfo ? (
+        <div className="bg-gradient-to-br from-purple-500/10 to-zinc-900/50 rounded-xl p-4 border border-purple-500/20 mb-4">
+          <div className="flex items-center justify-center py-2">
+            <div className="inline-block animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
+          </div>
+        </div>
+      ) : userPromoInfo && userPromoInfo.hasPromoCode ? (
+        <div className="bg-gradient-to-br from-purple-500/10 to-zinc-900/50 rounded-xl p-4 border border-purple-500/20 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              <p className="text-zinc-300 text-xs font-semibold">Ваш реферальный промокод</p>
+            </div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(userPromoInfo.promoCode);
+                if (typeof window !== "undefined" && window.Telegram?.WebApp?.HapticFeedback) {
+                  window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+                }
+              }}
+              className="p-1.5 hover:bg-purple-500/20 rounded-lg transition-all active:scale-95"
+              title="Скопировать"
+            >
+              <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </button>
+          </div>
+          <div className="bg-zinc-900/50 rounded-lg p-3 border border-purple-500/10 mb-2">
+            <code className="text-purple-400 font-mono font-bold text-xl tracking-wider">{userPromoInfo.promoCode}</code>
+          </div>
+          <div className="space-y-1.5">
+            {userPromoInfo.activations && userPromoInfo.activations.count > 0 && (
+              <div className="flex items-center gap-2 text-zinc-400 text-[10px]">
+                <svg className="w-3 h-3 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>Активаций: <strong className="text-purple-400">{userPromoInfo.activations.count}</strong></span>
+              </div>
+            )}
+            <p className="text-zinc-500 text-[10px] leading-tight">
+              💎 Друзья получат <strong className="text-purple-400">3 дня VPN</strong>, вы — <strong className="text-purple-400">20%</strong> от их пополнений на баланс
+            </p>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Promo Code Activation Section */}
       <div className="bg-zinc-900/50 rounded-xl border border-zinc-800/50 p-4 mb-4">
         <h2 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
           <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +310,7 @@ export function AccountStep({
                 setPromoCode(e.target.value.toUpperCase());
                 setPromoMessage(null);
               }}
-              placeholder="Введите промокод"
+              placeholder="Введите промокод друга или админский"
               className="flex-1 px-3 py-2 bg-zinc-800/50 border border-zinc-700/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all text-sm"
               disabled={promoLoading}
               autoComplete="off"
@@ -239,26 +338,80 @@ export function AccountStep({
               )}
             </button>
           </div>
+          
+          {/* Info about promo types */}
+          <div className="bg-zinc-800/30 rounded-lg p-2 border border-zinc-700/30">
+            <p className="text-zinc-400 text-[10px] leading-tight">
+              💡 <strong>Реферальный:</strong> 3 дня VPN вам, 20% от пополнений другу<br/>
+              💰 <strong>На баланс:</strong> пополнение счета<br/>
+              📅 <strong>На дни:</strong> подписка на указанное количество дней
+            </p>
+          </div>
 
           {promoMessage && (
             <div
-              className={`p-2 rounded-lg border text-xs ${
+              className={`p-3 rounded-lg border ${
                 promoMessage.type === "success"
-                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
-                  : "bg-red-500/10 border-red-500/30 text-red-400"
+                  ? "bg-emerald-500/10 border-emerald-500/30"
+                  : "bg-red-500/10 border-red-500/30"
               } animate-in fade-in duration-300`}
             >
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-start gap-2">
                 {promoMessage.type === "success" ? (
-                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 flex-shrink-0 text-emerald-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
-                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 flex-shrink-0 text-red-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 )}
-                <p className="font-medium">{promoMessage.text}</p>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-medium text-xs ${promoMessage.type === "success" ? "text-emerald-400" : "text-red-400"} whitespace-pre-line`}>
+                    {promoMessage.text}
+                  </p>
+                  {promoMessage.details && (
+                    <>
+                      {promoMessage.details.subscription && (
+                        <div className="mt-2 pt-2 border-t border-emerald-500/20">
+                          <p className="text-emerald-300 text-[10px] mb-1.5 font-semibold">✅ Подписка создана!</p>
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-1.5">
+                              <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <span className="text-emerald-400 text-[10px]">
+                                Действует до {formatDate(promoMessage.details.subscription.endDate)}
+                              </span>
+                            </div>
+                            {promoMessage.details.reward.days && (
+                              <div className="flex items-center gap-1.5">
+                                <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span className="text-emerald-400 text-[10px]">
+                                  {promoMessage.details.reward.days} {promoMessage.details.reward.days === 1 ? "день" : promoMessage.details.reward.days < 5 ? "дня" : "дней"}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {promoMessage.details.balance && (
+                        <div className="mt-2 pt-2 border-t border-emerald-500/20">
+                          <div className="flex items-center gap-1.5">
+                            <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span className="text-emerald-400 text-[10px]">
+                              Текущий баланс: {promoMessage.details.balance.current} ₽
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}

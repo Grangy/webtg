@@ -39,3 +39,66 @@ export interface UserAccount {
 export type Step = "loading" | "info" | "plans" | "subscriptions" | "instructions" | "payment" | "processing" | "success" | "error" | "promo" | "account";
 
 export type DeviceType = "ios" | "android" | "android-tv" | "windows" | "macos";
+
+// Типы промокодов
+export type PromoCodeType = "referral" | "admin_balance" | "admin_days";
+export type PromoCategory = "money" | "days" | "referral";
+export type RewardType = "balance" | "subscription";
+
+export interface PromoReward {
+  type: RewardType;
+  amount?: number;
+  currency?: string;
+  days?: number;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface PromoActivationData {
+  promoType: PromoCodeType;
+  promoCategory: PromoCategory;
+  message: string;
+  code: string;
+  reward: PromoReward;
+  balance?: {
+    current: number;
+    currency: string;
+  };
+  subscription?: Subscription;
+}
+
+export interface PromoActivationResult {
+  ok: boolean;
+  message?: string;
+  error?: string;
+  data?: PromoActivationData;
+}
+
+export interface UserPromoInfo {
+  promoCode: string;
+  hasPromoCode: boolean;
+  activations?: {
+    count: number;
+    totalAmount: number;
+    list: Array<{
+      id: number;
+      amount: number;
+      createdAt: string;
+      activator: {
+        id: number;
+        telegramId: string;
+        username?: string;
+      };
+    }>;
+  };
+  activated?: {
+    amount: number;
+    createdAt: string;
+    codeOwner: {
+      id: number;
+      telegramId: string;
+      username?: string;
+      promoCode: string;
+    };
+  };
+}

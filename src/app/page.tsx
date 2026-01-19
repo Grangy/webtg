@@ -113,7 +113,7 @@ export default function Home() {
     }
   };
 
-  const handleActivatePromo = async (code: string): Promise<{ ok: boolean; message?: string; error?: string }> => {
+  const handleActivatePromo = async (code: string): Promise<{ ok: boolean; message?: string; error?: string; data?: any }> => {
     if (!tgUser) {
       return { ok: false, error: "Не удалось определить пользователя" };
     }
@@ -135,7 +135,18 @@ export default function Home() {
       if (data.ok) {
         // Обновляем данные пользователя после успешной активации
         await loadUserData(tgUser.id.toString());
-        return { ok: true, message: data.message || "Промокод успешно активирован!" };
+        
+        // Если промокод создал подписку, показываем уведомление
+        if (data.data?.subscription) {
+          // Подписка уже будет в обновленных данных пользователя
+          // Можно показать дополнительное уведомление или перейти к подпискам
+        }
+        
+        return { 
+          ok: true, 
+          message: data.data?.message || data.message || "Промокод успешно активирован!",
+          data: data.data
+        };
       } else {
         return { ok: false, error: data.error, message: data.message || "Ошибка активации промокода" };
       }
