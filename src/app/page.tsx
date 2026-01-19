@@ -23,6 +23,7 @@ import { ProcessingStep } from "@/components/steps/ProcessingStep";
 import { SuccessStep } from "@/components/steps/SuccessStep";
 import { ErrorStep } from "@/components/steps/ErrorStep";
 import { Instructions } from "@/components/instructions/Instructions";
+import { PromoCodeStep } from "@/components/steps/PromoCodeStep";
 
 export default function Home() {
   // State
@@ -83,7 +84,7 @@ export default function Home() {
   };
 
   const handleBack = () => {
-    if (step === "subscriptions" || step === "instructions") {
+    if (step === "subscriptions" || step === "instructions" || step === "promo") {
       setStep("info"); // Возвращаемся на информационный экран
       setShowPlans(false);
       setIsRenewal(false); // Сбрасываем флаг продления
@@ -111,6 +112,38 @@ export default function Home() {
     }
   };
 
+  const handleActivatePromo = async (code: string): Promise<{ ok: boolean; message?: string; error?: string }> => {
+    if (!tgUser) {
+      return { ok: false, error: "Не удалось определить пользователя" };
+    }
+
+    try {
+      const response = await fetch("/api/promo/activate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          telegramId: tgUser.id.toString(),
+          code: code,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.ok) {
+        // Обновляем данные пользователя после успешной активации
+        await loadUserData(tgUser.id.toString());
+        return { ok: true, message: data.message || "Промокод успешно активирован!" };
+      } else {
+        return { ok: false, error: data.error, message: data.message || "Ошибка активации промокода" };
+      }
+    } catch (error) {
+      console.error("Error activating promo:", error);
+      return { ok: false, error: "SERVER_ERROR", message: "Произошла ошибка. Попробуйте позже." };
+    }
+  };
+
   const handleInstructionsClick = () => {
     setStep("instructions");
     if (typeof window !== "undefined") {
@@ -119,8 +152,8 @@ export default function Home() {
   };
 
   const handleAvatarClick = () => {
-    setStep("subscriptions");
-    setShowPlans(false);
+    // Переход в раздел промокода (личный кабинет)
+    setStep("promo");
     if (typeof window !== "undefined") {
       window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
     }
@@ -242,7 +275,7 @@ export default function Home() {
             user={user}
             tgUser={tgUser}
             onBack={handleBack}
-            showBack={step === "payment" || step === "error" || step === "subscriptions" || step === "instructions" || step === "plans"}
+            showBack={step === "payment" || step === "error" || step === "subscriptions" || step === "instructions" || step === "plans" || step === "promo"}
             onSubscriptionsClick={handleSubscriptionsClick}
             onLogoClick={handleLogoClick}
             onAvatarClick={handleAvatarClick}
@@ -262,6 +295,12 @@ export default function Home() {
                     onBuyClick={handleBuyClick}
                     onSubscriptionsClick={handleSubscriptionsClick}
                     onInstructionsClick={handleInstructionsClick}
+                    onPromoClick={() => {
+                      setStep("promo");
+                      if (typeof window !== "undefined") {
+                        window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
+                      }
+                    }}
                   />
                 </div>
               )}
@@ -269,6 +308,16 @@ export default function Home() {
               {step === "instructions" && (
                 <div className="animate-in fade-in slide-in-from-right duration-300">
                   <InstructionsStep onBack={handleBack} />
+                </div>
+              )}
+
+              {step === "promo" && (
+                <div className="animate-in fade-in slide-in-from-right duration-300">
+                  <PromoCodeStep
+                    tgUser={tgUser}
+                    onActivate={handleActivatePromo}
+                    onBack={handleBack}
+                  />
                 </div>
               )}
 

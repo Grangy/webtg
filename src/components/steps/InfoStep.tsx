@@ -7,9 +7,10 @@ interface InfoStepProps {
   onBuyClick: () => void;
   onSubscriptionsClick?: () => void;
   onInstructionsClick?: () => void;
+  onPromoClick?: () => void;
 }
 
-export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstructionsClick }: InfoStepProps) {
+export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstructionsClick, onPromoClick }: InfoStepProps) {
   const activeSubscriptions = user?.subscriptions.filter((s) => s.isActive) || [];
   const hasActiveSubscriptions = activeSubscriptions.length > 0;
 
@@ -77,7 +78,7 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
       {/* CTA Button */}
       <button
         onClick={onBuyClick}
-        className="w-full p-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-base rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 mb-4 relative overflow-hidden group"
+        className="w-full p-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold text-base rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2 mb-2 relative overflow-hidden group"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
         <svg className="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,6 +86,19 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
         </svg>
         <span className="relative z-10">Купить VPN</span>
       </button>
+
+      {/* Promo Code Button */}
+      {onPromoClick && (
+        <button
+          onClick={onPromoClick}
+          className="w-full p-2.5 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 text-white font-medium text-sm rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2 mb-4"
+        >
+          <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+          </svg>
+          <span>Промокод</span>
+        </button>
+      )}
 
       {/* Benefits */}
       <div className="bg-gradient-to-br from-emerald-500/10 to-zinc-900/50 rounded-xl p-3 border border-emerald-500/20 mb-4">

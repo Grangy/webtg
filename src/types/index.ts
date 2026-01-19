@@ -36,6 +36,6 @@ export interface UserAccount {
   subscriptions: Subscription[];
 }
 
-export type Step = "loading" | "info" | "plans" | "subscriptions" | "instructions" | "payment" | "processing" | "success" | "error";
+export type Step = "loading" | "info" | "plans" | "subscriptions" | "instructions" | "payment" | "processing" | "success" | "error" | "promo";
 
 export type DeviceType = "ios" | "android" | "android-tv" | "windows" | "macos";
