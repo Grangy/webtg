@@ -17,20 +17,25 @@ interface AccountStepProps {
   user: UserAccount | null;
   tgUser: UserData | null;
   onSubscriptionsClick: () => void;
-  onPromoClick: () => void;
+  onActivatePromo: (code: string) => Promise<{ ok: boolean; message?: string; error?: string }>;
   onBack: () => void;
+  onUserDataUpdate?: () => void;
 }
 
 export function AccountStep({
   user,
   tgUser,
   onSubscriptionsClick,
-  onPromoClick,
+  onActivatePromo,
   onBack,
+  onUserDataUpdate,
 }: AccountStepProps) {
   const [topups, setTopups] = useState<Topup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     if (!tgUser) {
@@ -83,6 +88,53 @@ export function AccountStep({
         return "Ошибка";
       default:
         return status;
+    }
+  };
+
+  const handlePromoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!promoCode.trim()) {
+      setPromoMessage({ type: "error", text: "Введите промокод" });
+      return;
+    }
+
+    setPromoLoading(true);
+    setPromoMessage(null);
+
+    try {
+      const result = await onActivatePromo(promoCode.trim().toUpperCase());
+      
+      if (result.ok) {
+        setPromoMessage({ type: "success", text: result.message || "Промокод успешно активирован!" });
+        setPromoCode("");
+        
+        // Обновляем данные пользователя после успешной активации
+        if (onUserDataUpdate) {
+          onUserDataUpdate();
+        }
+        
+        // Haptic feedback
+        if (typeof window !== "undefined" && window.Telegram?.WebApp?.HapticFeedback) {
+          window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        }
+      } else {
+        setPromoMessage({ type: "error", text: result.message || result.error || "Ошибка активации промокода" });
+        
+        // Haptic feedback
+        if (typeof window !== "undefined" && window.Telegram?.WebApp?.HapticFeedback) {
+          window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
+        }
+      }
+    } catch (error) {
+      setPromoMessage({ type: "error", text: "Произошла ошибка. Попробуйте позже." });
+      
+      // Haptic feedback
+      if (typeof window !== "undefined" && window.Telegram?.WebApp?.HapticFeedback) {
+        window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
+      }
+    } finally {
+      setPromoLoading(false);
     }
   };
 
@@ -139,16 +191,78 @@ export function AccountStep({
           </svg>
           <span>Мои подписки</span>
         </button>
+      </div>
 
-        <button
-          onClick={onPromoClick}
-          className="w-full p-3 bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 text-white font-medium rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-        >
+      {/* Promo Code Section */}
+      <div className="bg-zinc-900/50 rounded-xl border border-zinc-800/50 p-4 mb-4">
+        <h2 className="text-white font-semibold text-sm mb-3 flex items-center gap-2">
           <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
           </svg>
-          <span>Промокод</span>
-        </button>
+          Активация промокода
+        </h2>
+
+        <form onSubmit={handlePromoSubmit} className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={promoCode}
+              onChange={(e) => {
+                setPromoCode(e.target.value.toUpperCase());
+                setPromoMessage(null);
+              }}
+              placeholder="Введите промокод"
+              className="flex-1 px-3 py-2 bg-zinc-800/50 border border-zinc-700/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all text-sm"
+              disabled={promoLoading}
+              autoComplete="off"
+              autoCapitalize="characters"
+            />
+            <button
+              type="submit"
+              disabled={promoLoading || !promoCode.trim()}
+              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm rounded-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+            >
+              {promoLoading ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Активировать</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {promoMessage && (
+            <div
+              className={`p-2 rounded-lg border text-xs ${
+                promoMessage.type === "success"
+                  ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-400"
+                  : "bg-red-500/10 border-red-500/30 text-red-400"
+              } animate-in fade-in duration-300`}
+            >
+              <div className="flex items-center gap-1.5">
+                {promoMessage.type === "success" ? (
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                )}
+                <p className="font-medium">{promoMessage.text}</p>
+              </div>
+            </div>
+          )}
+        </form>
       </div>
 
       {/* Topups History */}

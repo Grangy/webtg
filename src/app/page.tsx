@@ -318,26 +318,11 @@ export default function Home() {
                     user={user}
                     tgUser={tgUser}
                     onSubscriptionsClick={handleSubscriptionsClick}
-                    onPromoClick={() => {
-                      setStep("promo");
-                      if (typeof window !== "undefined") {
-                        window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
-                      }
-                    }}
+                    onActivatePromo={handleActivatePromo}
                     onBack={handleBack}
-                  />
-                </div>
-              )}
-
-              {step === "promo" && (
-                <div className="animate-in fade-in slide-in-from-right duration-300">
-                  <PromoCodeStep
-                    tgUser={tgUser}
-                    onActivate={handleActivatePromo}
-                    onBack={() => {
-                      setStep("account");
-                      if (typeof window !== "undefined") {
-                        window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
+                    onUserDataUpdate={() => {
+                      if (tgUser) {
+                        loadUserData(tgUser.id.toString());
                       }
                     }}
                   />
