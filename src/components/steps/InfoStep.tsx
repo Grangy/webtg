@@ -28,7 +28,7 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
             />
           </div>
         </div>
-        <h1 className="text-2xl font-bold text-white mb-1.5">Безлимитный VPN</h1>
+        <h1 className="text-2xl font-bold text-white mb-1.5">Интернет без границ</h1>
         <p className="text-zinc-400 text-sm">Защита и свобода в интернете</p>
       </div>
 
@@ -97,7 +97,7 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
         <div className="space-y-2">
           {[
             "Защита данных в публичных Wi-Fi сетях",
-            "Обход блокировок и цензуры",
+            "Шифрование трафика для приватности",
             "Высокая скорость подключения",
             "Поддержка 24/7",
           ].map((benefit, i) => (
