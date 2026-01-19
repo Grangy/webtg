@@ -302,42 +302,19 @@ export function AccountStep({
         </h2>
 
         <form onSubmit={handlePromoSubmit} className="space-y-2">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={promoCode}
-              onChange={(e) => {
-                setPromoCode(e.target.value.toUpperCase());
-                setPromoMessage(null);
-              }}
-              placeholder="Введите промокод друга или админский"
-              className="flex-1 px-3 py-2 bg-zinc-800/50 border border-zinc-700/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all text-sm"
-              disabled={promoLoading}
-              autoComplete="off"
-              autoCapitalize="characters"
-            />
-            <button
-              type="submit"
-              disabled={promoLoading || !promoCode.trim()}
-              className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm rounded-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
-            >
-              {promoLoading ? (
-                <>
-                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Активировать</span>
-                </>
-              )}
-            </button>
-          </div>
+          <input
+            type="text"
+            value={promoCode}
+            onChange={(e) => {
+              setPromoCode(e.target.value.toUpperCase());
+              setPromoMessage(null);
+            }}
+            placeholder="Введите промокод друга или админский"
+            className="w-full px-3 py-2 bg-zinc-800/50 border border-zinc-700/50 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all text-sm"
+            disabled={promoLoading}
+            autoComplete="off"
+            autoCapitalize="characters"
+          />
           
           {/* Info about promo types */}
           <div className="bg-zinc-800/30 rounded-lg p-2 border border-zinc-700/30">
@@ -347,6 +324,29 @@ export function AccountStep({
               📅 <strong>На дни:</strong> подписка на указанное количество дней
             </p>
           </div>
+
+          <button
+            type="submit"
+            disabled={promoLoading || !promoCode.trim()}
+            className="w-full px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm rounded-lg transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {promoLoading ? (
+              <>
+                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                <span>Активация...</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Активировать</span>
+              </>
+            )}
+          </button>
 
           {promoMessage && (
             <div

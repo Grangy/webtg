@@ -308,7 +308,7 @@ export default function Home() {
                     onSubscriptionsClick={handleSubscriptionsClick}
                     onInstructionsClick={handleInstructionsClick}
                     onPromoClick={() => {
-                      setStep("promo");
+                      setStep("account");
                       if (typeof window !== "undefined") {
                         window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
                       }
