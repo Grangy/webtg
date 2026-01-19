@@ -36,6 +36,7 @@ yarn-error.log*
 
 # API documentation (contains secrets)
 api.md
+API.md
 
 # Deployment documentation (contains access info)
 DEPLOY.md
