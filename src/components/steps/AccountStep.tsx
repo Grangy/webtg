@@ -350,7 +350,7 @@ export function AccountStep({
 
           {promoMessage && (
             <div
-              className={`p-3 rounded-lg border ${
+              className={`p-3 rounded-lg border w-full max-w-full overflow-x-hidden ${
                 promoMessage.type === "success"
                   ? "bg-emerald-500/10 border-emerald-500/30"
                   : "bg-red-500/10 border-red-500/30"
@@ -366,18 +366,18 @@ export function AccountStep({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 )}
-                <div className="flex-1 min-w-0">
-                  <p className={`font-medium text-xs ${promoMessage.type === "success" ? "text-emerald-400" : "text-red-400"} whitespace-pre-line`}>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                  <p className={`font-medium text-xs ${promoMessage.type === "success" ? "text-emerald-400" : "text-red-400"} whitespace-pre-line break-words overflow-wrap-anywhere`}>
                     {promoMessage.text}
                   </p>
                   {promoMessage.details && (
                     <>
                       {promoMessage.details.subscription && (
-                        <div className="mt-2 pt-2 border-t border-emerald-500/20">
+                        <div className="mt-2 pt-2 border-t border-emerald-500/20 space-y-2">
                           <p className="text-emerald-300 text-[10px] mb-1.5 font-semibold">✅ Подписка создана!</p>
-                          <div className="space-y-1">
+                          <div className="space-y-1.5">
                             <div className="flex items-center gap-1.5">
-                              <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-3 h-3 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                               <span className="text-emerald-400 text-[10px]">
@@ -386,12 +386,41 @@ export function AccountStep({
                             </div>
                             {promoMessage.details.reward.days && (
                               <div className="flex items-center gap-1.5">
-                                <svg className="w-3 h-3 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-3 h-3 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                                 <span className="text-emerald-400 text-[10px]">
                                   {promoMessage.details.reward.days} {promoMessage.details.reward.days === 1 ? "день" : promoMessage.details.reward.days < 5 ? "дня" : "дней"}
                                 </span>
+                              </div>
+                            )}
+                            {/* Subscription URLs */}
+                            {promoMessage.details.subscription.subscriptionUrl && (
+                              <div className="space-y-1.5 pt-1">
+                                <div className="bg-zinc-900/50 rounded-lg p-2 border border-zinc-800/30 overflow-hidden">
+                                  <div className="flex items-center gap-1 mb-1">
+                                    <svg className="w-3 h-3 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                    </svg>
+                                    <span className="text-zinc-400 text-[9px] font-medium">Сервер 1</span>
+                                  </div>
+                                  <code className="text-emerald-400 font-mono text-[9px] leading-tight block break-all overflow-wrap-anywhere min-w-0">
+                                    {promoMessage.details.subscription.subscriptionUrl}
+                                  </code>
+                                </div>
+                                {promoMessage.details.subscription.subscriptionUrl2 && (
+                                  <div className="bg-zinc-900/50 rounded-lg p-2 border border-zinc-800/30 overflow-hidden">
+                                    <div className="flex items-center gap-1 mb-1">
+                                      <svg className="w-3 h-3 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                      </svg>
+                                      <span className="text-zinc-400 text-[9px] font-medium">Сервер 2 (Россия)</span>
+                                    </div>
+                                    <code className="text-emerald-400 font-mono text-[9px] leading-tight block break-all overflow-wrap-anywhere min-w-0">
+                                      {promoMessage.details.subscription.subscriptionUrl2}
+                                    </code>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
