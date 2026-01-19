@@ -23,7 +23,6 @@ import { ProcessingStep } from "@/components/steps/ProcessingStep";
 import { SuccessStep } from "@/components/steps/SuccessStep";
 import { ErrorStep } from "@/components/steps/ErrorStep";
 import { Instructions } from "@/components/instructions/Instructions";
-import { PromoCodeStep } from "@/components/steps/PromoCodeStep";
 import { AccountStep } from "@/components/steps/AccountStep";
 
 export default function Home() {
