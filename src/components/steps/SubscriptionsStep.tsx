@@ -160,9 +160,9 @@ export function SubscriptionsStep({
                       Открыть в Happ
                     </button>
                     <button
-                      onClick={() => onCopyUrl(formatHappLink(sub.subscriptionUrl))}
+                      onClick={() => onCopyUrl(sub.subscriptionUrl)}
                       className="p-2.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-xl transition-all active:scale-95 border border-zinc-700"
-                      title="Скопировать Happ ссылку"
+                      title="Скопировать ссылку сервера"
                     >
                       <svg
                         className="w-4 h-4"

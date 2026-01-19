@@ -31,6 +31,7 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [copied, setCopied] = useState(false);
   const [showPlans, setShowPlans] = useState(false);
+  const [isRenewal, setIsRenewal] = useState(false);
 
   // Hooks
   const { mounted, isTelegram, tgUser, setTgUser, initTelegram } = useTelegram();
@@ -72,14 +73,25 @@ export default function Home() {
     }
   };
 
+  const handleBuyClick = () => {
+    setIsRenewal(false); // Сбрасываем флаг при новой покупке
+    setStep("plans");
+    setShowPlans(true);
+    if (typeof window !== "undefined") {
+      window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
+    }
+  };
+
   const handleBack = () => {
     if (step === "subscriptions" || step === "instructions") {
       setStep("info"); // Возвращаемся на информационный экран
       setShowPlans(false);
+      setIsRenewal(false); // Сбрасываем флаг продления
     } else if (step === "plans") {
       setStep("info"); // Возвращаемся на информационный экран
       setShowPlans(false);
       setSelectedPlan(null);
+      setIsRenewal(false); // Сбрасываем флаг продления
     } else {
       setStep("plans");
       setShowPlans(false);
@@ -114,15 +126,16 @@ export default function Home() {
     }
   };
 
-  const handleRenewSubscription = (subscriptionId: number) => {
+  const handleRenewSubscription = useCallback((subscriptionId: number) => {
     // Переходим на экран выбора планов для продления
+    setIsRenewal(true); // Устанавливаем флаг продления
     setStep("plans");
     setShowPlans(true);
     setSelectedPlan(null);
     if (typeof window !== "undefined") {
       window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
     }
-  };
+  }, []);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -139,30 +152,39 @@ export default function Home() {
     if (typeof window === "undefined") return;
 
     // Telegram WebApp блокирует кастомные протоколы (happ://)
-    // Используем создание скрытого <a> элемента и клик по нему
-    // Это самый надежный способ для мобильных браузеров
+    // Используем несколько методов для максимальной совместимости
     try {
-      // Создаем временный элемент <a>
+      // Метод 1: Прямое открытие через location (для некоторых браузеров)
+      try {
+        window.location.href = happLink;
+        // Если это сработало, выходим
+        if (window.Telegram?.WebApp?.HapticFeedback) {
+          window.Telegram.WebApp.HapticFeedback.notificationOccurred("success");
+        }
+        return;
+      } catch (e) {
+        // Продолжаем к другим методам
+      }
+
+      // Метод 2: Создаем видимый элемент <a> и кликаем по нему
       const link = document.createElement("a");
       link.href = happLink;
-      link.style.position = "fixed";
-      link.style.left = "-9999px";
-      link.style.top = "-9999px";
-      link.style.opacity = "0";
-      link.style.pointerEvents = "none";
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
       
-      // Добавляем в DOM
+      // Делаем элемент видимым на короткое время для лучшей совместимости
+      link.style.position = "fixed";
+      link.style.left = "0";
+      link.style.top = "0";
+      link.style.width = "1px";
+      link.style.height = "1px";
+      link.style.opacity = "0.01";
+      link.style.zIndex = "9999";
+      
       document.body.appendChild(link);
       
-      // Создаем событие клика
-      const clickEvent = new MouseEvent("click", {
-        view: window,
-        bubbles: true,
-        cancelable: true,
-      });
-      
       // Кликаем программно
-      link.dispatchEvent(clickEvent);
+      link.click();
       
       // Haptic feedback
       if (window.Telegram?.WebApp?.HapticFeedback) {
@@ -177,8 +199,17 @@ export default function Home() {
       }, 1000);
       
       // Копируем ссылку в буфер на всякий случай
-      // (если приложение не откроется, пользователь сможет вставить вручную)
       copyToClipboard(happLink);
+      
+      // Показываем уведомление, что ссылка скопирована
+      setTimeout(() => {
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.showAlert(
+            "Попытка открыть приложение...\n\nЕсли приложение не открылось, ссылка скопирована в буфер обмена."
+          );
+        }
+      }, 500);
+      
     } catch (error) {
       // Fallback: просто копируем в буфер обмена
       console.warn("Failed to open Happ link:", error);
@@ -196,6 +227,7 @@ export default function Home() {
     setStep("plans");
     setSelectedPlan(null);
     setShowPlans(false); // Возвращаемся на главный экран с подписками
+    setIsRenewal(false); // Сбрасываем флаг продления
     payment.setNewSubscription(null);
     if (tgUser) {
       loadUserData(tgUser.id.toString());
@@ -214,14 +246,6 @@ export default function Home() {
     }
   };
 
-  const handleBuyClick = () => {
-    // Переход от информационного экрана к выбору тарифов
-    setStep("plans");
-    setShowPlans(true);
-    if (typeof window !== "undefined") {
-      window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
-    }
-  };
 
   if (!mounted || step === "loading") {
     return (
@@ -336,6 +360,7 @@ export default function Home() {
                     onOpenHappLink={openSubscriptionLink}
                     onBack={handleBackToPlans}
                     onInstructionsClick={handleInstructionsClick}
+                    isRenewal={isRenewal}
                   />
                 </div>
               )}

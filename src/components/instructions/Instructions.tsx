@@ -24,11 +24,11 @@ const deviceInstructions: Record<DeviceType, {
     Icon: AppleIcon,
     iconColor: "text-gray-100",
     appLinks: [
-      { label: "App Store (Happ)", url: "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215", type: "store" },
       { label: "App Store (Happ Plus)", url: "https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973", type: "store" },
+      { label: "App Store (Happ) (Альтернатива)", url: "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215", type: "store" },
     ],
     steps: [
-      "Скачайте приложение Happ из App Store (ссылки ниже)",
+      "Скачайте приложение Happ Plus из App Store (ссылки ниже)",
       "Откройте приложение и нажмите «Добавить сервер»",
       "Вставьте скопированную ссылку подключения",
       "Нажмите «Подключиться» и разрешите создание VPN-профиля",
@@ -40,11 +40,11 @@ const deviceInstructions: Record<DeviceType, {
     Icon: AppleIcon,
     iconColor: "text-gray-100",
     appLinks: [
-      { label: "App Store (Happ)", url: "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215", type: "store" },
       { label: "App Store (Happ Plus)", url: "https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973", type: "store" },
+      { label: "App Store (Happ) (Альтернатива)", url: "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215", type: "store" },
     ],
     steps: [
-      "Скачайте приложение Happ из App Store (ссылки ниже)",
+      "Скачайте приложение Happ Plus из App Store (ссылки ниже)",
       "Откройте приложение и нажмите «Добавить сервер»",
       "Вставьте скопированную ссылку подключения",
       "Нажмите «Подключиться» и разрешите создание VPN-профиля",
