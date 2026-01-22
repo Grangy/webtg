@@ -138,7 +138,7 @@ export function AccountStep({
           } else if (promoCategory === "days" && reward.days) {
             successMessage = `✅ Вам начислена подписка на ${reward.days} дней`;
           } else if (promoCategory === "referral" && reward.days) {
-            successMessage = `🎁 Вы получили VPN на ${reward.days} дня!\n💰 Ваш друг получит 20% от ваших пополнений`;
+            successMessage = `🎁 Вы получили подписку на ${reward.days} дня!\n💰 Ваш друг получит 20% от ваших пополнений`;
           }
         }
         
@@ -286,7 +286,7 @@ export function AccountStep({
               </div>
             )}
             <p className="text-zinc-500 text-[10px] leading-tight">
-              💎 Друзья получат <strong className="text-purple-400">3 дня VPN</strong>, вы — <strong className="text-purple-400">20%</strong> от их пополнений на баланс
+              💎 Друзья получат <strong className="text-purple-400">3 дня подписки</strong>, вы — <strong className="text-purple-400">20%</strong> от их пополнений на баланс
             </p>
           </div>
         </div>
@@ -319,7 +319,7 @@ export function AccountStep({
           {/* Info about promo types */}
           <div className="bg-zinc-800/30 rounded-lg p-2 border border-zinc-700/30">
             <p className="text-zinc-400 text-[10px] leading-tight">
-              💡 <strong>Реферальный:</strong> 3 дня VPN вам, 20% от пополнений другу<br/>
+              💡 <strong>Реферальный:</strong> 3 дня подписки вам, 20% от пополнений другу<br/>
               💰 <strong>На баланс:</strong> пополнение счета<br/>
               📅 <strong>На дни:</strong> подписка на указанное количество дней
             </p>

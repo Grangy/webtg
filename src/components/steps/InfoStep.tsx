@@ -22,7 +22,7 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
           <div className="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg">
             <Image
               src="/logo.jpg"
-              alt="MaxGroot VPN"
+              alt="MaxGroot"
               width={64}
               height={64}
               className="w-full h-full object-cover"
@@ -84,7 +84,7 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
         <svg className="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
-        <span className="relative z-10">Купить VPN</span>
+        <span className="relative z-10">Купить</span>
       </button>
 
       {/* Promo Code Button */}

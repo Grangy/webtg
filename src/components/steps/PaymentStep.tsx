@@ -29,7 +29,7 @@ export function PaymentStep({
         <div className="p-3 border-b border-zinc-800/50">
           <p className="text-zinc-400 text-xs mb-1">Тариф</p>
           <p className="text-white font-semibold text-base">
-            MaxGroot VPN • {selectedPlan.label}
+            MaxGroot • {selectedPlan.label}
           </p>
         </div>
         <div className="p-3 bg-zinc-800/30">

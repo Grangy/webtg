@@ -14,12 +14,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "MaxGroot VPN — Безлимитный VPN для всех устройств",
-  description: "Безлимитный VPN с высокой скоростью, защитой данных и поддержкой всех устройств. Подписки от 1 до 12 месяцев.",
-  keywords: "VPN, виртуальная частная сеть, защита данных, обход блокировок, MaxGroot",
+  title: "MaxGroot — Безлимитный интернет для всех устройств",
+  description: "Безлимитный интернет с высокой скоростью, защитой данных и поддержкой всех устройств. Подписки от 1 до 12 месяцев.",
+  keywords: "интернет, защита данных, обход блокировок, MaxGroot",
   openGraph: {
-    title: "MaxGroot VPN",
-    description: "Безлимитный VPN для всех устройств",
+    title: "MaxGroot",
+    description: "Безлимитный интернет для всех устройств",
     type: "website",
   },
 };

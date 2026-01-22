@@ -43,7 +43,7 @@ export function PlansStep({
         <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold text-white mb-2">Добро пожаловать!</h1>
-            <p className="text-zinc-500 mb-6">У вас есть активные подписки VPN</p>
+            <p className="text-zinc-500 mb-6">У вас есть активные подписки</p>
           </div>
 
           {/* Кнопка перехода в подписки */}
@@ -93,7 +93,7 @@ export function PlansStep({
         // Экран выбора тарифов (как было)
         <>
           <h1 className="text-xl font-bold text-white mb-1">Выберите тариф</h1>
-          <p className="text-zinc-500 text-sm mb-4">Безлимитный VPN для всех устройств</p>
+          <p className="text-zinc-500 text-sm mb-4">Безлимитный интернет для всех устройств</p>
 
           <PlansList
             plans={plans}

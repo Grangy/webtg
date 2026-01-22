@@ -231,7 +231,7 @@ export default function Home() {
       
       if (window.Telegram?.WebApp) {
         window.Telegram.WebApp.showAlert(
-          "Ссылка скопирована в буфер обмена.\n\nВставьте её в приложение Happ для подключения VPN."
+          "Ссылка скопирована в буфер обмена.\n\nВставьте её в приложение Happ для подключения."
         );
       }
     }

@@ -230,7 +230,7 @@ export function SubscriptionsStep({
           </div>
           <p className="text-zinc-500 text-lg mb-2">Нет активных подписок</p>
           <p className="text-zinc-600 text-sm">
-            Выберите тариф, чтобы начать пользоваться VPN
+            Выберите тариф, чтобы начать пользоваться
           </p>
         </div>
       )}
