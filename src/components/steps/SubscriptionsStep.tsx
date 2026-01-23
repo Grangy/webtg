@@ -108,7 +108,7 @@ export function SubscriptionsStep({
 
                   {sub.subscriptionUrl2 && (
                     <div>
-                      <p className="text-zinc-500 text-xs mb-2">Сервер 2 (Для Миранды):</p>
+                      <p className="text-zinc-500 text-xs mb-2">Сервер 2 (Миранда, иногда МТС):</p>
                       <div className="flex items-center gap-2">
                         <code className="text-emerald-400 font-mono text-xs flex-1 truncate bg-black/30 p-2 rounded">
                           {sub.subscriptionUrl2}
