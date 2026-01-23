@@ -335,6 +335,7 @@ export default function Home() {
                         loadUserData(tgUser.id.toString());
                       }
                     }}
+                    onInstructionsClick={handleInstructionsClick}
                   />
                 </div>
               )}
