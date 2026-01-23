@@ -349,10 +349,37 @@ export function SetupWizard({
 
         <button
           onClick={handleComplete}
-          className="w-full p-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25"
+          className="w-full p-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm rounded-xl transition-all active:scale-[0.98] shadow-lg shadow-emerald-500/25 mb-3"
         >
           Готово, подключил
         </button>
+
+        {/* Support Section */}
+        <div className="flex items-center gap-2 p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+          <svg className="w-4 h-4 text-blue-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+          <div className="flex-1 min-w-0">
+            <p className="text-blue-400 text-xs font-medium mb-0.5">Нужна помощь?</p>
+            <button
+              onClick={() => {
+                if (typeof window !== "undefined") {
+                  const supportUrl = "https://t.me/supmaxgroot";
+                  if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(supportUrl);
+                  } else if (window.Telegram?.WebApp?.openLink) {
+                    window.Telegram.WebApp.openLink(supportUrl, { try_instant_view: false });
+                  } else {
+                    window.open(supportUrl, "_blank");
+                  }
+                }
+              }}
+              className="text-blue-300 text-[10px] hover:text-blue-200 underline transition-colors"
+            >
+              Написать в техподдержку @supmaxgroot
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
