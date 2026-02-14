@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { UserData } from "@/types";
+import { getReferralSource } from "@/lib/referral";
 
 export function useTelegram() {
   const [mounted, setMounted] = useState(false);
@@ -49,6 +50,8 @@ export function useTelegram() {
       if (tg) {
         tg.ready();
         tg.expand();
+        // Сохраняем referral source (start_param, напр. happ_press) при запуске
+        getReferralSource();
 
         const telegramUser = tg.initDataUnsafe?.user;
 

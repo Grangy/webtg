@@ -85,6 +85,30 @@ npm run dev
    - Используйте `/setmenubutton` или настройте через Bot Settings
    - Укажите URL: `https://web.grangy.ru`
 
+### Деплой на сервер (93.123.39.210, PM2: webapp)
+
+На сервере проект уже развёрнут и запущен в PM2 под именем `webapp`. Для обновления используйте скрипт:
+
+```bash
+# По умолчанию: хост 93.123.39.210, ключ ~/.ssh/shared_server_key, путь /var/www/webapp
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
+
+Переменные окружения (при необходимости):
+
+- `DEPLOY_HOST` — хост (по умолчанию 93.123.39.210)
+- `DEPLOY_USER` — пользователь SSH (по умолчанию root)
+- `DEPLOY_PATH` — путь к проекту на сервере (по умолчанию /var/www/webapp)
+- `SSH_KEY` — путь к SSH-ключу (по умолчанию ~/.ssh/shared_server_key)
+- `PM2_APP` — имя приложения в PM2 (по умолчанию webapp)
+
+Пример с другим путём:
+
+```bash
+DEPLOY_PATH=/home/user/webapp SSH_KEY=~/.ssh/shared_server_key ./scripts/deploy.sh
+```
+
 ### Docker (опционально)
 
 ```dockerfile

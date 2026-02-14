@@ -13,10 +13,10 @@ function getApiSecret(): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { telegramId, amount } = body;
+    const { telegramId, amount, referral_source: referralSource } = body;
     const API_SECRET = getApiSecret();
 
-    console.log("Topup create request:", { telegramId, amount, API_URL, hasSecret: !!API_SECRET });
+    console.log("Topup create request:", { telegramId, amount, referral_source: referralSource, API_URL, hasSecret: !!API_SECRET });
 
     if (!telegramId || !amount) {
       console.error("Missing params:", { telegramId, amount });
@@ -25,6 +25,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const apiBody: Record<string, unknown> = { telegramId, amount };
+    if (referralSource) apiBody.referral_source = referralSource;
 
     const apiUrl = `${API_URL}/topup/create`;
     console.log("Calling API:", apiUrl);
@@ -35,7 +38,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
         "X-Webapp-Secret": API_SECRET,
       },
-      body: JSON.stringify({ telegramId, amount }),
+      body: JSON.stringify(apiBody),
     });
 
     console.log("API response status:", response.status);

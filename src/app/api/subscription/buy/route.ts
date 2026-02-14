@@ -13,7 +13,7 @@ function getApiSecret(): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { telegramId, planId } = body;
+    const { telegramId, planId, referral_source: referralSource } = body;
 
     if (!telegramId || !planId) {
       return NextResponse.json(
@@ -22,13 +22,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const apiBody: Record<string, unknown> = { telegramId, planId };
+    if (referralSource) apiBody.referral_source = referralSource;
+
     const response = await fetch(`${API_URL}/subscription/buy`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "X-Webapp-Secret": getApiSecret(),
       },
-      body: JSON.stringify({ telegramId, planId }),
+      body: JSON.stringify(apiBody),
     });
 
     const data = await response.json();

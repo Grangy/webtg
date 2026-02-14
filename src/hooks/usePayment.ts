@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, Dispatch, SetStateAction } from "react";
 import { Plan, Subscription, UserData, Step } from "@/types";
+import { getStoredReferralSource } from "@/lib/referral";
 
 interface UsePaymentProps {
   tgUser: UserData | null;
@@ -66,12 +67,14 @@ export function usePayment({
     setStep("payment");
 
     try {
+      const referralSource = getStoredReferralSource();
       const response = await fetch("/api/topup/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           telegramId,
           amount: selectedPlan.price,
+          ...(referralSource && { referral_source: referralSource }),
         }),
       });
 
@@ -128,12 +131,14 @@ export function usePayment({
     setStep("processing");
 
     try {
+      const referralSource = getStoredReferralSource();
       const response = await fetch("/api/subscription/buy", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           telegramId: tgUser.id.toString(),
           planId: selectedPlan.id,
+          ...(referralSource && { referral_source: referralSource }),
         }),
       });
 
