@@ -85,23 +85,16 @@ npm run dev
    - Используйте `/setmenubutton` или настройте через Bot Settings
    - Укажите URL: `https://web.grangy.ru`
 
-### Деплой на сервер (93.123.39.210, PM2: webapp)
+### Деплой на сервер (195.66.27.66, web.grangy.ru)
 
-На сервере проект уже развёрнут и запущен в PM2 под именем `webapp`. Для обновления используйте скрипт:
+Проект webtg развёрнут в `/var/www/webtg`, PM2-приложение: `web.grangy.ru`.
 
 ```bash
-# По умолчанию: хост 93.123.39.210, ключ ~/.ssh/shared_server_key, путь /var/www/webapp
 chmod +x scripts/deploy.sh
 ./scripts/deploy.sh
 ```
 
-Переменные окружения (при необходимости):
-
-- `DEPLOY_HOST` — хост (по умолчанию 93.123.39.210)
-- `DEPLOY_USER` — пользователь SSH (по умолчанию root)
-- `DEPLOY_PATH` — путь к проекту на сервере (по умолчанию /var/www/webapp)
-- `SSH_KEY` — путь к SSH-ключу (по умолчанию ~/.ssh/shared_server_key)
-- `PM2_APP` — имя приложения в PM2 (по умолчанию webapp)
+По умолчанию: хост 195.66.27.66, путь /var/www/webtg, PM2 web.grangy.ru, ключ ~/.ssh/shared_server_key. Переменные: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_PATH`, `SSH_KEY`, `PM2_APP`.
 
 Пример с другим путём:
 

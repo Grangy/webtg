@@ -5,11 +5,12 @@
 
 set -e
 
-DEPLOY_HOST="${DEPLOY_HOST:-93.123.39.210}"
+# Сервер webtg (web.grangy.ru)
+DEPLOY_HOST="${DEPLOY_HOST:-195.66.27.66}"
 DEPLOY_USER="${DEPLOY_USER:-root}"
-DEPLOY_PATH="${DEPLOY_PATH:-/var/www/webapp}"
+DEPLOY_PATH="${DEPLOY_PATH:-/var/www/webtg}"
 SSH_KEY="${SSH_KEY:-$HOME/.ssh/shared_server_key}"
-PM2_APP="${PM2_APP:-webapp}"
+PM2_APP="${PM2_APP:-web.grangy.ru}"
 
 SSH_OPTS=(-o StrictHostKeyChecking=accept-new)
 [[ -f "$SSH_KEY" ]] && SSH_OPTS+=(-i "$SSH_KEY")
