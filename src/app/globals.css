@@ -85,6 +85,16 @@ body {
   to { transform: scale(1) translateX(-50%); opacity: 1; }
 }
 
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @keyframes shimmer {
   0% { background-position: -1000px 0; }
   100% { background-position: 1000px 0; }
@@ -114,6 +124,14 @@ body {
   animation-name: zoom-in;
 }
 
+.fade-in-up {
+  animation-name: fade-in-up;
+}
+
+.scale-in {
+  animation-name: scale-in;
+}
+
 .duration-200 {
   animation-duration: 200ms;
 }
@@ -124,6 +142,10 @@ body {
 
 .duration-500 {
   animation-duration: 500ms;
+}
+
+.duration-700 {
+  animation-duration: 700ms;
 }
 
 .skeleton {
