@@ -36,7 +36,7 @@ export default function Home() {
 
   // Hooks
   const { mounted, isTelegram, tgUser, setTgUser, initTelegram } = useTelegram();
-  const { user, setUser, loadUserData } = useUserData();
+  const { user, setUser, loadUserData, syncUserData } = useUserData();
   const { plans, plansLoading, loadPlans } = usePlans();
 
   const payment = usePayment({
@@ -46,6 +46,7 @@ export default function Home() {
     setUser,
     setStep,
     setErrorMessage,
+    onSyncAfterPayment: tgUser ? () => syncUserData(tgUser.id.toString()) : undefined,
   });
 
   // Initialize
@@ -55,16 +56,39 @@ export default function Home() {
     loadPlans();
 
     const init = async () => {
-      // Инициализируем Telegram и получаем пользователя
       const telegramUser = await initTelegram();
       if (telegramUser) {
         await loadUserData(telegramUser.id.toString());
       }
-      setStep("info"); // Начинаем с информационного экрана
+      setStep("info");
     };
 
     init();
   }, [mounted, initTelegram, loadUserData, loadPlans]);
+
+  // Принудительная синхронизация при возврате в приложение (баланс + подписки + цены)
+  useEffect(() => {
+    if (!mounted || !tgUser) return;
+
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        syncUserData(tgUser.id.toString());
+        loadPlans();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [mounted, tgUser, syncUserData, loadPlans]);
+
+  // Синхронизация баланса и подписок при открытии экранов «Аккаунт», «Подписки», «Планы»
+  useEffect(() => {
+    if (!tgUser || !step) return;
+    if (step === "account" || step === "subscriptions" || step === "plans") {
+      syncUserData(tgUser.id.toString());
+      if (step === "plans") loadPlans();
+    }
+  }, [step, tgUser, syncUserData, loadPlans]);
 
   // Handlers
   const handleSelectPlan = (plan: Plan) => {
@@ -106,7 +130,8 @@ export default function Home() {
 
   const handleSubscriptionsClick = () => {
     setStep("subscriptions");
-    setShowPlans(false); // Сбрасываем при переходе в подписки
+    setShowPlans(false);
+    if (tgUser) syncUserData(tgUser.id.toString());
     if (typeof window !== "undefined") {
       window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
     }
@@ -163,8 +188,8 @@ export default function Home() {
   };
 
   const handleAvatarClick = () => {
-    // Переход в личный кабинет
     setStep("account");
+    if (tgUser) syncUserData(tgUser.id.toString());
     if (typeof window !== "undefined") {
       window.Telegram?.WebApp?.HapticFeedback?.selectionChanged();
     }

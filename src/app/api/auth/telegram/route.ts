@@ -17,14 +17,20 @@ export async function POST(request: NextRequest) {
     if (!botToken) {
       // В режиме разработки без токена — показываем данные без проверки
       console.warn("⚠️ BOT_TOKEN not configured, skipping validation");
-      
       const params = new URLSearchParams(initData);
-      const userData = params.get("user");
-      
+      const userStr = params.get("user");
+      let user: unknown = null;
+      if (userStr) {
+        try {
+          user = JSON.parse(userStr);
+        } catch {
+          // ignore invalid JSON
+        }
+      }
       return NextResponse.json({
         valid: false,
         warning: "BOT_TOKEN not configured - validation skipped",
-        user: userData ? JSON.parse(userData) : null,
+        user,
         raw: initData,
       });
     }

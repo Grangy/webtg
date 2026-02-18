@@ -32,7 +32,10 @@ export interface Subscription {
 export interface UserAccount {
   telegramId: string;
   username: string;
+  /** Общий баланс (основной + с рефералов) */
   balance: number;
+  /** Заработано с рефералов (если API отдаёт) */
+  referralBalance?: number;
   subscriptions: Subscription[];
 }
 

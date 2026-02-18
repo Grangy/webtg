@@ -9,6 +9,7 @@ interface UsePaymentProps {
   setUser: (user: any) => void;
   setStep: Dispatch<SetStateAction<Step>>;
   setErrorMessage: Dispatch<SetStateAction<string>>;
+  onSyncAfterPayment?: () => Promise<void>;
 }
 
 export function usePayment({
@@ -18,6 +19,7 @@ export function usePayment({
   setUser,
   setStep,
   setErrorMessage,
+  onSyncAfterPayment,
 }: UsePaymentProps) {
   const [orderId, setOrderId] = useState<string>("");
   const [paymentUrl, setPaymentUrl] = useState<string>("");
@@ -150,6 +152,7 @@ export function usePayment({
           setUser({ ...user, balance: result.data.newBalance });
         }
         setStep("success");
+        await onSyncAfterPayment?.();
 
         if (typeof window !== "undefined") {
           window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred("success");
@@ -163,7 +166,7 @@ export function usePayment({
       setErrorMessage("Ошибка сети. Попробуйте позже.");
       setStep("error");
     }
-  }, [selectedPlan, tgUser, user, setUser, setStep, setErrorMessage]);
+  }, [selectedPlan, tgUser, user, setUser, setStep, setErrorMessage, onSyncAfterPayment]);
 
   const buyWithBalance = useCallback(async () => {
     await buySubscription();

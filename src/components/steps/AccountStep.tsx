@@ -219,8 +219,11 @@ export function AccountStep({
         <div className="bg-gradient-to-br from-emerald-500/10 to-zinc-900/50 rounded-xl p-4 border border-emerald-500/20 mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-zinc-400 text-xs mb-1">Баланс</p>
+              <p className="text-zinc-400 text-xs mb-1">Общий баланс</p>
               <p className="text-2xl font-bold text-emerald-400">{user.balance} ₽</p>
+              {user.referralBalance != null && user.referralBalance > 0 && (
+                <p className="text-zinc-500 text-xs mt-1">в т.ч. с рефералов: {user.referralBalance} ₽</p>
+              )}
             </div>
             <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
               <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

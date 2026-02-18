@@ -20,11 +20,11 @@ export async function GET(
   const limit = searchParams.get("limit");
 
   try {
-    const params = new URLSearchParams();
-    if (status) params.append("status", status);
-    if (limit) params.append("limit", limit);
+    const query = new URLSearchParams();
+    if (status) query.append("status", status);
+    if (limit) query.append("limit", limit);
     
-    const queryString = params.toString();
+    const queryString = query.toString();
     const url = queryString
       ? `${API_URL}/user/${telegramId}/topups?${queryString}`
       : `${API_URL}/user/${telegramId}/topups`;
@@ -33,9 +33,16 @@ export async function GET(
       headers: {
         "X-Webapp-Secret": getApiSecret(),
       },
+      cache: "no-store",
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      return NextResponse.json(
+        data?.message ? data : { ok: false, error: "API_ERROR", message: "Ошибка загрузки пополнений" },
+        { status: response.status }
+      );
+    }
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching topups:", error);

@@ -1,23 +1,17 @@
 import { UserAccount, UserData } from "@/types";
 import Image from "next/image";
 
-function BalanceDisplay({ balance }: { balance: number }) {
+function BalanceDisplay({ balance, title }: { balance: number; title?: string }) {
   const balanceStr = `${balance} ₽`;
   const length = balanceStr.length;
-  
-  // Динамический размер шрифта в зависимости от длины числа
-  let fontSize = "text-sm"; // 14px по умолчанию
-  
-  if (length >= 12) {
-    fontSize = "text-[10px]"; // 10px для очень длинных чисел (100000+ ₽)
-  } else if (length >= 10) {
-    fontSize = "text-xs"; // 12px для длинных чисел (10000+ ₽)
-  } else if (length >= 8) {
-    fontSize = "text-xs"; // 12px для средних чисел (1000+ ₽)
-  }
-  
+
+  let fontSize = "text-sm";
+  if (length >= 12) fontSize = "text-[10px]";
+  else if (length >= 10) fontSize = "text-xs";
+  else if (length >= 8) fontSize = "text-xs";
+
   return (
-    <span className={`text-emerald-400 font-bold whitespace-nowrap ${fontSize} leading-tight`}>
+    <span title={title ?? "Общий баланс"} className={`text-emerald-400 font-bold whitespace-nowrap ${fontSize} leading-tight`}>
       {balanceStr}
     </span>
   );

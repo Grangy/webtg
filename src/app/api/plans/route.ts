@@ -17,11 +17,16 @@ export async function GET() {
       headers: {
         "X-Webapp-Secret": API_SECRET,
       },
-      // Кэшируем на 5 минут
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      return NextResponse.json(
+        data?.message ? data : { ok: false, error: "API_ERROR", message: "Ошибка загрузки тарифов" },
+        { status: response.status }
+      );
+    }
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching plans:", error);

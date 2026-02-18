@@ -56,6 +56,7 @@ export async function GET(
       headers: {
         "X-Webapp-Secret": API_SECRET,
       },
+      cache: "no-store",
     });
 
     console.log("API response status:", response.status);

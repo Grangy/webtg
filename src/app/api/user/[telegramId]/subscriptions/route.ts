@@ -27,9 +27,16 @@ export async function GET(
       headers: {
         "X-Webapp-Secret": getApiSecret(),
       },
+      cache: "no-store",
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      return NextResponse.json(
+        data?.message ? data : { ok: false, error: "API_ERROR", message: "Ошибка загрузки подписок" },
+        { status: response.status }
+      );
+    }
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching subscriptions:", error);

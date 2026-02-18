@@ -8,7 +8,10 @@ export function usePlans() {
   const loadPlans = useCallback(async () => {
     setPlansLoading(true);
     try {
-      const response = await fetch("/api/plans");
+      const response = await fetch("/api/plans", {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache, no-store" },
+      });
       const result = await response.json();
 
       if (result.ok && result.data) {

@@ -35,6 +35,12 @@ export async function POST(request: NextRequest) {
     });
 
     const data = await response.json();
+    if (!response.ok) {
+      return NextResponse.json(
+        data?.message ? data : { ok: false, error: "API_ERROR", message: "Ошибка покупки подписки" },
+        { status: response.status }
+      );
+    }
     return NextResponse.json(data);
   } catch (error) {
     console.error("Error buying subscription:", error);
