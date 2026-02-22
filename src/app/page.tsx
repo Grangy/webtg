@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import Script from "next/script";
 import { Step, Plan } from "@/types";
 import { useTelegram } from "@/hooks/useTelegram";
 import { useUserData } from "@/hooks/useUserData";
@@ -46,7 +45,7 @@ export default function Home() {
     setUser,
     setStep,
     setErrorMessage,
-    onSyncAfterPayment: tgUser ? () => syncUserData(tgUser.id.toString()) : undefined,
+    onSyncAfterPayment: tgUser ? () => syncUserData(tgUser.id.toString(), true) : undefined,
   });
 
   // Initialize
@@ -72,7 +71,7 @@ export default function Home() {
 
     const handleVisibility = () => {
       if (document.visibilityState === "visible") {
-        syncUserData(tgUser.id.toString());
+        syncUserData(tgUser.id.toString(), true);
         loadPlans();
       }
     };
@@ -85,7 +84,7 @@ export default function Home() {
   useEffect(() => {
     if (!tgUser || !step) return;
     if (step === "account" || step === "subscriptions" || step === "plans") {
-      syncUserData(tgUser.id.toString());
+      syncUserData(tgUser.id.toString(), true);
       if (step === "plans") loadPlans();
     }
   }, [step, tgUser, syncUserData, loadPlans]);
@@ -287,24 +286,11 @@ export default function Home() {
 
 
   if (!mounted || step === "loading") {
-    return (
-      <>
-        <Script
-          src="https://telegram.org/js/telegram-web-app.js"
-          strategy="afterInteractive"
-        />
-        <LoadingSpinner message="Загрузка..." size="md" />
-      </>
-    );
+    return <LoadingSpinner message="Загрузка..." size="md" />;
   }
 
   return (
     <>
-      <Script
-        src="https://telegram.org/js/telegram-web-app.js"
-        strategy="afterInteractive"
-      />
-
       <main className="min-h-screen bg-[#0a0a0a] text-white">
         <div className="min-h-screen flex flex-col">
           <Header
@@ -376,7 +362,7 @@ export default function Home() {
                     onCreatePayment={payment.createPayment}
                     onBuyWithBalance={payment.buyWithBalance}
                     onCopyUrl={copyToClipboard}
-                    onRetryLoadPlans={loadPlans}
+                    onRetryLoadPlans={() => loadPlans(true)}
                     onSubscriptionsClick={handleSubscriptionsClick}
                     showPlans={showPlans}
                     onShowPlans={() => setShowPlans(true)}

@@ -59,6 +59,7 @@ export function Header({ user, tgUser, onBack, showBack, onSubscriptionsClick, o
                     width={32}
                     height={32}
                     className="w-full h-full object-cover"
+                    priority
                   />
                 </div>
                 <span className="text-xl font-bold text-white">MaxGroot</span>
@@ -72,6 +73,7 @@ export function Header({ user, tgUser, onBack, showBack, onSubscriptionsClick, o
                     width={32}
                     height={32}
                     className="w-full h-full object-cover"
+                    priority
                   />
                 </div>
                 <span className="text-xl font-bold text-white">MaxGroot</span>

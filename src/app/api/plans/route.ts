@@ -17,7 +17,7 @@ export async function GET() {
       headers: {
         "X-Webapp-Secret": API_SECRET,
       },
-      cache: "no-store",
+      next: { revalidate: 3600 },
     });
 
     const data = await response.json();
@@ -27,7 +27,11 @@ export async function GET() {
         { status: response.status }
       );
     }
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+      },
+    });
   } catch (error) {
     console.error("Error fetching plans:", error);
     return NextResponse.json(

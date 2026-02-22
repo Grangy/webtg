@@ -37,7 +37,7 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
       <div className="text-center mb-6 animate-in fade-in-up duration-500">
         <div className="flex justify-center mb-3">
           <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 border border-zinc-800/80 animate-in scale-in duration-500">
-            <Image src="/logo.jpg" alt="MaxGroot" width={56} height={56} className="w-full h-full object-cover" />
+            <Image src="/logo.jpg" alt="MaxGroot" width={56} height={56} className="w-full h-full object-cover" priority />
           </div>
         </div>
         <h1 className="text-xl font-semibold text-white mb-1">Интернет без границ</h1>
