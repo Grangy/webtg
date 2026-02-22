@@ -53,34 +53,24 @@ export async function GET(
       );
     }
 
-    // Баланс: общий (основной + реферальный). Источник правды — GET /user/:id/balance
-    // Бэкенд может вернуть: totalBalance, balance+referralBalance, или только balance
+    // Баланс: берём из GET /user/:id/balance. Поле balance — уже общий (включая реферальные начисления).
+    // balanceReferral/referralBalance — только для отображения "в т.ч. с рефералов", НЕ суммируем.
     let totalBalance = 0;
     let referralBalance = 0;
     const bal = (balanceData?.data ?? balanceData) as Record<string, unknown>;
     if (bal) {
       const num = (v: unknown) => (typeof v === "number" ? v : parseInt(String(v ?? 0)) || 0);
-      const main = num(bal.balance);
-      const ref =
+      totalBalance =
+        num(bal.totalBalance) ||
+        num(bal.balance) ||
+        0;
+      referralBalance =
         num(bal.referralBalance) ||
         num(bal.referral_balance) ||
         num(bal.balanceReferral) ||
         num(bal.balance_referral) ||
         num(bal.earnedFromReferrals) ||
-        num(bal.referral_earnings) ||
         0;
-
-      if (bal.totalBalance != null) {
-        // Бэкенд отдаёт общий в totalBalance
-        totalBalance = num(bal.totalBalance);
-      } else if (ref > 0) {
-        // Есть реферальный — суммируем
-        referralBalance = ref;
-        totalBalance = main + ref;
-      } else {
-        // Один баланс — используем как общий (как в боте)
-        totalBalance = main;
-      }
     }
 
     // Подписки: только из /subscriptions (источник правды)
