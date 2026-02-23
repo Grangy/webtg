@@ -1,12 +1,12 @@
 import { useState, useCallback, useRef, Dispatch, SetStateAction } from "react";
-import { Plan, Subscription, UserData, Step } from "@/types";
+import { Plan, Subscription, UserData, Step, UserAccount } from "@/types";
 import { getStoredReferralSource } from "@/lib/referral";
 
 interface UsePaymentProps {
   tgUser: UserData | null;
   selectedPlan: Plan | null;
   user: { telegramId: string } | null;
-  setUser: (user: any) => void;
+  setUser: Dispatch<SetStateAction<UserAccount | null>>;
   setStep: Dispatch<SetStateAction<Step>>;
   setErrorMessage: Dispatch<SetStateAction<string>>;
   onSyncAfterPayment?: () => Promise<void>;
@@ -15,7 +15,7 @@ interface UsePaymentProps {
 export function usePayment({
   tgUser,
   selectedPlan,
-  user,
+  user: _user,
   setUser,
   setStep,
   setErrorMessage,
@@ -52,81 +52,6 @@ export function usePayment({
     return telegramId;
   }, [tgUser]);
 
-  const createPayment = useCallback(async () => {
-    if (!selectedPlan) {
-      console.error("No plan selected");
-      return;
-    }
-
-    const telegramId = getTelegramId();
-    if (!telegramId) {
-      setErrorMessage("Не удалось определить ID пользователя. Откройте приложение через Telegram.");
-      setStep("error");
-      return;
-    }
-
-    console.log("Creating payment:", { telegramId, amount: selectedPlan.price, plan: selectedPlan.id });
-    setStep("payment");
-
-    try {
-      const referralSource = getStoredReferralSource();
-      const response = await fetch("/api/topup/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          telegramId,
-          amount: selectedPlan.price,
-          ...(referralSource && { referral_source: referralSource }),
-        }),
-      });
-
-      const result = await response.json();
-      console.log("Payment creation response:", result);
-
-      if (result.ok && result.data) {
-        if (!result.data.paymentUrl) {
-          setErrorMessage("Ошибка: не получена ссылка на оплату");
-          setStep("error");
-          return;
-        }
-
-        setOrderId(result.data.orderId);
-        setPaymentUrl(result.data.paymentUrl);
-
-        // Открываем ссылку на оплату
-        const urlToOpen = result.data.paymentUrl;
-        let linkOpened = false;
-
-        if (typeof window !== "undefined" && window.Telegram?.WebApp?.openLink) {
-          try {
-            window.Telegram.WebApp.openLink(urlToOpen, { try_instant_view: false });
-            linkOpened = true;
-          } catch (error) {
-            console.error("Error opening link:", error);
-          }
-        }
-
-        if (!linkOpened && typeof window !== "undefined") {
-          try {
-            window.open(urlToOpen, "_blank");
-          } catch (error) {
-            console.error("Error opening link:", error);
-          }
-        }
-
-        startPaymentCheck(result.data.orderId);
-      } else {
-        const errorMsg = result.message || result.error || "Ошибка создания платежа";
-        setErrorMessage(errorMsg);
-        setStep("error");
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      setErrorMessage("Ошибка сети. Попробуйте позже.");
-      setStep("error");
-    }
-  }, [selectedPlan, getTelegramId, setStep, setErrorMessage]);
-
   const buySubscription = useCallback(async () => {
     if (!selectedPlan || !tgUser) return;
 
@@ -148,9 +73,9 @@ export function usePayment({
 
       if (result.ok && result.data) {
         setNewSubscription(result.data.subscription);
-        if (user) {
-          setUser({ ...user, balance: result.data.newBalance });
-        }
+        setUser((prev) =>
+          prev ? { ...prev, balance: result.data.newBalance } : null
+        );
         setStep("success");
         await onSyncAfterPayment?.();
 
@@ -166,13 +91,14 @@ export function usePayment({
       setErrorMessage("Ошибка сети. Попробуйте позже.");
       setStep("error");
     }
-  }, [selectedPlan, tgUser, user, setUser, setStep, setErrorMessage, onSyncAfterPayment]);
+  }, [selectedPlan, tgUser, setUser, setStep, setErrorMessage, onSyncAfterPayment]);
 
   const buyWithBalance = useCallback(async () => {
     await buySubscription();
   }, [buySubscription]);
 
-  const startPaymentCheck = useCallback((paymentOrderId: string) => {
+  const startPaymentCheck = useCallback(
+    (paymentOrderId: string) => {
     setCheckingPayment(true);
 
     const checkStatus = async () => {
@@ -217,7 +143,81 @@ export function usePayment({
       setStep("error");
       setErrorMessage("Истекло время ожидания оплаты");
     }, 600000);
-  }, [buySubscription, setStep, setErrorMessage]);
+    },
+    [buySubscription, setStep, setErrorMessage]
+  );
+
+  const createPayment = useCallback(async () => {
+    if (!selectedPlan) {
+      console.error("No plan selected");
+      return;
+    }
+
+    const telegramId = getTelegramId();
+    if (!telegramId) {
+      setErrorMessage("Не удалось определить ID пользователя. Откройте приложение через Telegram.");
+      setStep("error");
+      return;
+    }
+
+    setStep("payment");
+
+    try {
+      const referralSource = getStoredReferralSource();
+      const response = await fetch("/api/topup/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          telegramId,
+          amount: selectedPlan.price,
+          ...(referralSource && { referral_source: referralSource }),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.ok && result.data) {
+        if (!result.data.paymentUrl) {
+          setErrorMessage("Ошибка: не получена ссылка на оплату");
+          setStep("error");
+          return;
+        }
+
+        setOrderId(result.data.orderId);
+        setPaymentUrl(result.data.paymentUrl);
+
+        const urlToOpen = result.data.paymentUrl;
+        let linkOpened = false;
+
+        if (typeof window !== "undefined" && window.Telegram?.WebApp?.openLink) {
+          try {
+            window.Telegram.WebApp.openLink(urlToOpen, { try_instant_view: false });
+            linkOpened = true;
+          } catch (err) {
+            console.error("Error opening link:", err);
+          }
+        }
+
+        if (!linkOpened && typeof window !== "undefined") {
+          try {
+            window.open(urlToOpen, "_blank");
+          } catch (err) {
+            console.error("Error opening link:", err);
+          }
+        }
+
+        startPaymentCheck(result.data.orderId);
+      } else {
+        const errorMsg = result.message || result.error || "Ошибка создания платежа";
+        setErrorMessage(errorMsg);
+        setStep("error");
+      }
+    } catch (err) {
+      console.error("Payment error:", err);
+      setErrorMessage("Ошибка сети. Попробуйте позже.");
+      setStep("error");
+    }
+  }, [selectedPlan, getTelegramId, setStep, setErrorMessage, startPaymentCheck]);
 
   const manualCheck = useCallback(async () => {
     if (!orderId) return;

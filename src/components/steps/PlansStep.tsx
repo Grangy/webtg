@@ -24,7 +24,7 @@ export function PlansStep({
   onSelectPlan,
   onCreatePayment,
   onBuyWithBalance,
-  onCopyUrl,
+  onCopyUrl: _onCopyUrl,
   onRetryLoadPlans,
   onSubscriptionsClick,
   showPlans = true,

@@ -1,6 +1,5 @@
 import { Plan } from "@/types";
 import { getDiscount, isPopularPlan } from "@/utils/planUtils";
-import { getMonthWord } from "@/utils/formatters";
 
 interface PlanCardProps {
   plan: Plan;

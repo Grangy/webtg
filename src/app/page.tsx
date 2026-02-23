@@ -21,7 +21,6 @@ import { PaymentStep } from "@/components/steps/PaymentStep";
 import { ProcessingStep } from "@/components/steps/ProcessingStep";
 import { SuccessStep } from "@/components/steps/SuccessStep";
 import { ErrorStep } from "@/components/steps/ErrorStep";
-import { Instructions } from "@/components/instructions/Instructions";
 import { AccountStep } from "@/components/steps/AccountStep";
 
 export default function Home() {
@@ -34,7 +33,7 @@ export default function Home() {
   const [isRenewal, setIsRenewal] = useState(false);
 
   // Hooks
-  const { mounted, isTelegram, tgUser, setTgUser, initTelegram } = useTelegram();
+  const { mounted, tgUser, initTelegram } = useTelegram();
   const { user, setUser, loadUserData, syncUserData } = useUserData();
   const { plans, plansLoading, loadPlans } = usePlans();
 
@@ -136,7 +135,7 @@ export default function Home() {
     }
   };
 
-  const handleActivatePromo = async (code: string): Promise<{ ok: boolean; message?: string; error?: string; data?: any }> => {
+  const handleActivatePromo = async (code: string): Promise<{ ok: boolean; message?: string; error?: string; data?: import("@/types").PromoActivationData }> => {
     if (!tgUser) {
       return { ok: false, error: "Не удалось определить пользователя" };
     }
@@ -194,7 +193,7 @@ export default function Home() {
     }
   };
 
-  const handleRenewSubscription = useCallback((subscriptionId: number) => {
+  const handleRenewSubscription = useCallback((_subscriptionId: number) => {
     // Переходим на экран выбора планов для продления
     setIsRenewal(true); // Устанавливаем флаг продления
     setStep("plans");

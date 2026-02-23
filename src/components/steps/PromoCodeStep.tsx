@@ -9,7 +9,7 @@ interface PromoCodeStepProps {
   onBack: () => void;
 }
 
-export function PromoCodeStep({ tgUser, onActivate, onBack }: PromoCodeStepProps) {
+export function PromoCodeStep({ tgUser: _tgUser, onActivate, onBack }: PromoCodeStepProps) {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -44,7 +44,7 @@ export function PromoCodeStep({ tgUser, onActivate, onBack }: PromoCodeStepProps
           window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
         }
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: "error", text: "Произошла ошибка. Попробуйте позже." });
       
       // Haptic feedback

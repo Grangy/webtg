@@ -116,7 +116,7 @@ export function SetupWizard({
 }: SetupWizardProps) {
   const [currentStep, setCurrentStep] = useState<SetupStep>("device");
   const [selectedDevice, setSelectedDevice] = useState<DeviceType | null>(null);
-  const [appDownloaded, setAppDownloaded] = useState(false);
+  const [, setAppDownloaded] = useState(false);
 
   const device = selectedDevice ? deviceData[selectedDevice] : null;
 
@@ -130,7 +130,7 @@ export function SetupWizard({
     setCurrentStep("setup");
   };
 
-  const handleSkipDownload = () => {
+  const _handleSkipDownload = () => {
     setAppDownloaded(true);
     setCurrentStep("setup");
   };

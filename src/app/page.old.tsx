@@ -43,7 +43,7 @@ type Step = "loading" | "plans" | "payment" | "processing" | "success" | "error"
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
-  const [isTelegram, setIsTelegram] = useState(false);
+  const [, setIsTelegram] = useState(false);
   const [tgUser, setTgUser] = useState<UserData | null>(null);
   
   // Data State
@@ -550,7 +550,7 @@ export default function Home() {
     }
   };
 
-  const getMonthWord = (months: number) => {
+  const _getMonthWord = (months: number) => {
     if (months === 1) return "месяц";
     if (months >= 2 && months <= 4) return "месяца";
     return "месяцев";

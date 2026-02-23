@@ -1,5 +1,5 @@
 import { UserAccount } from "@/types";
-import { formatHappLink, formatDate } from "@/utils/formatters";
+import { formatDate } from "@/utils/formatters";
 import { Instructions } from "@/components/instructions/Instructions";
 
 interface SubscriptionsStepProps {

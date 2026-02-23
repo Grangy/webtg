@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { UserAccount, UserData, UserPromoInfo, PromoActivationData } from "@/types";
 import { formatDate } from "@/utils/formatters";
 
@@ -132,7 +133,7 @@ export function AccountStep({
         let successMessage = result.message || "Промокод успешно активирован!";
         
         if (result.data) {
-          const { promoType, promoCategory, reward, balance, subscription } = result.data;
+          const { promoCategory, reward, balance } = result.data;
           
           // Дополнительная информация о награде
           if (promoCategory === "money" && reward.amount) {
@@ -177,7 +178,7 @@ export function AccountStep({
           window.Telegram.WebApp.HapticFeedback.notificationOccurred("error");
         }
       }
-    } catch (error) {
+    } catch {
       setPromoMessage({ type: "error", text: "Произошла ошибка. Попробуйте позже." });
       
       // Haptic feedback
@@ -196,10 +197,13 @@ export function AccountStep({
         <div className="flex justify-center mb-3">
           <div className="w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 shadow-lg bg-gradient-to-br from-emerald-500/20 to-purple-500/20 border border-emerald-500/30 flex items-center justify-center">
             {tgUser?.photo_url ? (
-              <img
+              <Image
                 src={tgUser.photo_url}
                 alt={tgUser.first_name}
+                width={64}
+                height={64}
                 className="w-full h-full object-cover"
+                unoptimized
               />
             ) : (
               <span className="text-2xl font-bold text-white">

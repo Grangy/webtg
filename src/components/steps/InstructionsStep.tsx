@@ -4,7 +4,7 @@ interface InstructionsStepProps {
   onBack?: () => void;
 }
 
-export function InstructionsStep({ onBack }: InstructionsStepProps) {
+export function InstructionsStep({ onBack: _onBack }: InstructionsStepProps) {
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-4">
