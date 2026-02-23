@@ -17,6 +17,13 @@ SSH_OPTS=(-o StrictHostKeyChecking=accept-new)
 
 echo "Deploying to $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH (PM2: $PM2_APP)"
 
-ssh "${SSH_OPTS[@]}" "$DEPLOY_USER@$DEPLOY_HOST" "cd $DEPLOY_PATH && git pull && npm ci && npm run build && pm2 restart $PM2_APP"
+# Перенос переменных роутера на прод (если есть локальный .env.router)
+if [[ -f .env.router ]]; then
+  scp "${SSH_OPTS[@]}" .env.router "$DEPLOY_USER@$DEPLOY_HOST:/tmp/env_router_append" 2>/dev/null || true
+fi
+
+ssh "${SSH_OPTS[@]}" "$DEPLOY_USER@$DEPLOY_HOST" "cd $DEPLOY_PATH && \
+  ( [ ! -f /tmp/env_router_append ] || ( grep -q ROUTER_ORDER_BOT_TOKEN .env 2>/dev/null || cat /tmp/env_router_append >> .env ); rm -f /tmp/env_router_append ) && \
+  git pull && npm ci && npm run build && pm2 restart $PM2_APP"
 
 echo "Done. PM2 app '$PM2_APP' restarted."

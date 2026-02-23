@@ -7,6 +7,7 @@ interface InfoStepProps {
   onSubscriptionsClick?: () => void;
   onInstructionsClick?: () => void;
   onPromoClick?: () => void;
+  onRouterClick?: () => void;
 }
 
 const features = [
@@ -15,7 +16,7 @@ const features = [
   { label: "Безлимит", path: "M8.111 16.404a5.5 5.5 0 017.778 0M12 20h.01" },
 ];
 
-export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstructionsClick, onPromoClick }: InfoStepProps) {
+export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstructionsClick, onPromoClick, onRouterClick }: InfoStepProps) {
   const activeSubscriptions = user?.subscriptions.filter((s) => s.isActive) || [];
   const hasActiveSubscriptions = activeSubscriptions.length > 0;
 
@@ -97,6 +98,21 @@ export function InfoStep({ user, onBuyClick, onSubscriptionsClick, onInstruction
         </svg>
         <span className="relative z-10">Купить</span>
       </button>
+
+      {/* Покупка роутера */}
+      {onRouterClick && (
+        <button
+          type="button"
+          onClick={onRouterClick}
+          className="w-full p-2 bg-zinc-800/50 hover:bg-zinc-700/50 border border-zinc-700/50 text-zinc-400 text-xs rounded-xl transition-colors active:scale-[0.99] flex items-center justify-center gap-2 mb-4 animate-in fade-in-up duration-300"
+          style={{ animationDelay: "340ms" }}
+        >
+          <svg className="w-3.5 h-3.5 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          Купить роутер
+        </button>
+      )}
 
       {/* Промокод */}
       {onPromoClick && (

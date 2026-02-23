@@ -325,6 +325,10 @@ export default function Home() {
                     onBuyClick={handleBuyClick}
                     onSubscriptionsClick={handleSubscriptionsClick}
                     onInstructionsClick={handleInstructionsClick}
+                    onRouterClick={() => {
+                      router.push("/router");
+                      window.Telegram?.WebApp?.HapticFeedback?.selectionChanged?.();
+                    }}
                     onPromoClick={() => {
                       setStep("account");
                       if (typeof window !== "undefined") {
