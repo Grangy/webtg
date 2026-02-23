@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Step, Plan } from "@/types";
 import { useTelegram } from "@/hooks/useTelegram";
 import { useUserData } from "@/hooks/useUserData";
 import { usePlans } from "@/hooks/usePlans";
 import { usePayment } from "@/hooks/usePayment";
 import { formatHappLink } from "@/utils/formatters";
+import { getReferralSource } from "@/lib/referral";
+import { ROUTER_START_PARAM } from "@/lib/constants";
 
 // Components
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -33,6 +36,7 @@ export default function Home() {
   const [isRenewal, setIsRenewal] = useState(false);
 
   // Hooks
+  const router = useRouter();
   const { mounted, tgUser, initTelegram } = useTelegram();
   const { user, setUser, loadUserData, syncUserData } = useUserData();
   const { plans, plansLoading, loadPlans } = usePlans();
@@ -55,6 +59,11 @@ export default function Home() {
 
     const init = async () => {
       const telegramUser = await initTelegram();
+      const startParam = getReferralSource();
+      if (startParam === ROUTER_START_PARAM) {
+        router.replace("/router");
+        return;
+      }
       if (telegramUser) {
         await loadUserData(telegramUser.id.toString());
       }
@@ -62,7 +71,7 @@ export default function Home() {
     };
 
     init();
-  }, [mounted, initTelegram, loadUserData, loadPlans]);
+  }, [mounted, initTelegram, loadUserData, loadPlans, router]);
 
   // Принудительная синхронизация при возврате в приложение (баланс + подписки + цены)
   useEffect(() => {
