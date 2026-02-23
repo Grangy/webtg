@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { UserAccount, UserData, UserPromoInfo, PromoActivationData } from "@/types";
 import { formatDate } from "@/utils/formatters";
+import { BalancePopover } from "@/components/ui/BalancePopover";
 
 interface Topup {
   id: number;
@@ -218,24 +219,26 @@ export function AccountStep({
         </p>
       </div>
 
-      {/* Balance Card */}
+      {/* Balance Card — клик: попап с разбивкой */}
       {user && (
-        <div className="bg-gradient-to-br from-emerald-500/10 to-zinc-900/50 rounded-xl p-4 border border-emerald-500/20 mb-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-zinc-400 text-xs mb-1">Общий баланс</p>
-              <p className="text-2xl font-bold text-emerald-400">{user.balance} ₽</p>
-              {user.referralBalance != null && user.referralBalance > 0 && (
-                <p className="text-zinc-500 text-xs mt-1">в т.ч. с рефералов: {user.referralBalance} ₽</p>
-              )}
-            </div>
-            <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-              <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <BalancePopover total={user.balance} referral={user.referralBalance ?? 0} className="block mb-4">
+          <div className="bg-gradient-to-br from-emerald-500/10 to-zinc-900/50 rounded-xl p-4 border border-emerald-500/20 hover:border-emerald-500/40 transition-colors cursor-pointer active:scale-[0.99]">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-zinc-400 text-xs mb-1">Общий баланс</p>
+                <p className="text-2xl font-bold text-emerald-400">{user.balance} ₽</p>
+                {user.referralBalance != null && user.referralBalance > 0 && (
+                  <p className="text-zinc-500 text-xs mt-1">в т.ч. с рефералов: {user.referralBalance} ₽</p>
+                )}
+              </div>
+              <div className="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                <svg className="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
           </div>
-        </div>
+        </BalancePopover>
       )}
 
       {/* Action Buttons */}

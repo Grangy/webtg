@@ -1,5 +1,6 @@
 import { UserAccount, UserData } from "@/types";
 import Image from "next/image";
+import { BalancePopover } from "@/components/ui/BalancePopover";
 
 function BalanceDisplay({ balance, title }: { balance: number; title?: string }) {
   const balanceStr = `${balance} ₽`;
@@ -94,9 +95,13 @@ export function Header({ user, tgUser, onBack, showBack, onSubscriptionsClick, o
               </button>
             )}
             {user && (
-              <div className="flex items-center gap-2 bg-zinc-800/80 rounded-xl px-2.5 py-1.5 min-w-0 max-w-[120px] flex-shrink-0">
-                <BalanceDisplay balance={user.balance} />
-              </div>
+              <BalancePopover
+                total={user.balance}
+                referral={user.referralBalance ?? 0}
+                className="flex items-center gap-2 bg-zinc-800/80 rounded-xl px-2.5 py-1.5 min-w-0 max-w-[120px] flex-shrink-0 hover:bg-zinc-700/80 transition-colors"
+              >
+                <BalanceDisplay balance={user.balance} title="Нажмите для разбивки" />
+              </BalancePopover>
             )}
             {tgUser && (
               <button
