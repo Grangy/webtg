@@ -59,6 +59,16 @@ export default function Home() {
 
     const init = async () => {
       const telegramUser = await initTelegram();
+      try {
+        if (typeof window !== "undefined" && sessionStorage.getItem("skip_router_redirect") === "1") {
+          sessionStorage.removeItem("skip_router_redirect");
+          if (telegramUser) await loadUserData(telegramUser.id.toString());
+          setStep("info");
+          return;
+        }
+      } catch {
+        // ignore
+      }
       const startParam = getReferralSource();
       if (startParam === ROUTER_START_PARAM) {
         router.replace("/router");

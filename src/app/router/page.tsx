@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { CDEK_POINTS_URL, SUPPORT_TG_URL } from "@/lib/constants";
+import { CDEK_POINTS_URL, REFERRAL_STORAGE_KEY, ROUTER_START_PARAM, SUPPORT_TG_URL } from "@/lib/constants";
 
-const ROUTER_PRICE = 5000;
+const ROUTER_PRICE = 5999;
 
 export default function RouterPage() {
   const router = useRouter();
@@ -69,6 +69,16 @@ export default function RouterPage() {
   };
 
   const goHome = () => {
+    try {
+      if (typeof window !== "undefined") {
+        if (localStorage.getItem(REFERRAL_STORAGE_KEY) === ROUTER_START_PARAM) {
+          localStorage.removeItem(REFERRAL_STORAGE_KEY);
+        }
+        sessionStorage.setItem("skip_router_redirect", "1");
+      }
+    } catch {
+      // ignore
+    }
     window.Telegram?.WebApp?.HapticFeedback?.selectionChanged?.();
     router.replace("/");
   };
