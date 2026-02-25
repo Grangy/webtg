@@ -53,8 +53,7 @@ export async function GET(
       );
     }
 
-    // Баланс: приоритет — явный общий баланс с бэкенда. Иначе не склеиваем main+referral,
-    // т.к. часто balance уже приходит как общий (иначе получается двойной учёт: 261+111=372).
+    // Баланс: приоритет — явный totalBalance/currentBalance с бэкенда. Иначе общий = основной + реферальный.
     let totalBalance = 0;
     let referralBalance = 0;
     const bal = (balanceData?.data ?? balanceData) as Record<string, unknown>;
@@ -68,10 +67,9 @@ export async function GET(
         num(bal.balance_referral) ||
         num(bal.earnedFromReferrals) ||
         0;
-      // Используем явный totalBalance/currentBalance с бэкенда; иначе считаем balance общим балансом (не добавляем referral).
       if (bal.totalBalance != null) totalBalance = num(bal.totalBalance);
       else if (bal.currentBalance != null) totalBalance = num(bal.currentBalance);
-      else totalBalance = main;
+      else totalBalance = main + referralBalance;
     }
 
     // Подписки: только из /subscriptions (источник правды)
