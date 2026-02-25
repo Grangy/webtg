@@ -53,13 +53,12 @@ export async function GET(
       );
     }
 
-    // Баланс: приоритет — явный totalBalance/currentBalance с бэкенда. Иначе общий = основной + реферальный.
+    // Баланс: бэкенд отдаёт totalBalance (источник правды), balance (основной), balanceReferral (реферальный).
     let totalBalance = 0;
     let referralBalance = 0;
     const bal = (balanceData?.data ?? balanceData) as Record<string, unknown>;
     if (bal) {
       const num = (v: unknown) => (typeof v === "number" ? v : parseInt(String(v ?? 0)) || 0);
-      const main = num(bal.balance);
       referralBalance =
         num(bal.referralBalance) ||
         num(bal.referral_balance) ||
@@ -69,7 +68,7 @@ export async function GET(
         0;
       if (bal.totalBalance != null) totalBalance = num(bal.totalBalance);
       else if (bal.currentBalance != null) totalBalance = num(bal.currentBalance);
-      else totalBalance = main + referralBalance;
+      else totalBalance = num(bal.balance) + referralBalance;
     }
 
     // Подписки: только из /subscriptions (источник правды)
