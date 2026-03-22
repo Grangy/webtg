@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CDEK_POINTS_URL, REFERRAL_STORAGE_KEY, ROUTER_START_PARAM, SUPPORT_TG_URL } from "@/lib/constants";
 
-const ROUTER_PRICE = 5999;
+/** Сумма к оплате за роутер (акция). */
+const ROUTER_PRICE = 4500;
+const ROUTER_PRICE_WAS = 6000;
 
 export default function RouterPage() {
   const router = useRouter();
@@ -160,6 +162,15 @@ export default function RouterPage() {
 
             {/* Payment CTA */}
             <div className="bg-zinc-800/40 border border-zinc-700/50 rounded-xl p-4 space-y-3">
+              <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/25 px-3 py-2.5">
+                <p className="text-emerald-400/95 text-sm font-medium text-center leading-snug">
+                  Цена была{" "}
+                  <span className="text-zinc-500 line-through decoration-zinc-500">
+                    {ROUTER_PRICE_WAS.toLocaleString("ru-RU")}₽
+                  </span>
+                  , а теперь всего {ROUTER_PRICE.toLocaleString("ru-RU")}₽ — акция действует до 27 марта!
+                </p>
+              </div>
               <p className="text-zinc-400 text-xs">
                 Оплата и точная стоимость доставки уточняются в поддержке. После отправки заявки с вами свяжутся.
               </p>
