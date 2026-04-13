@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
 import { UserAccount } from "@/types";
+import { getTelegramInitDataHeaders } from "@/lib/telegramWebApp";
 
 const USER_CACHE_MS = 60 * 1000;
 
@@ -41,7 +42,10 @@ export function useUserData() {
       if (Date.now() - (lastSyncRef.current[telegramId] ?? 0) < USER_CACHE_MS) return;
     }
     try {
-      const response = await fetch(`/api/user/${telegramId}/sync`);
+      const response = await fetch(`/api/user/${telegramId}/sync`, {
+        headers: { ...getTelegramInitDataHeaders() },
+        cache: "no-store",
+      });
       const result = await response.json();
 
       if (result.ok && result.data) {

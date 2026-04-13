@@ -5,6 +5,7 @@ import Image from "next/image";
 import { UserAccount, UserData, UserPromoInfo, PromoActivationData } from "@/types";
 import { formatDate } from "@/utils/formatters";
 import { BalancePopover } from "@/components/ui/BalancePopover";
+import { getTelegramInitDataHeaders } from "@/lib/telegramWebApp";
 
 interface Topup {
   id: number;
@@ -53,7 +54,10 @@ export function AccountStep({
     const loadTopups = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/user/${tgUser.id}/topups?limit=20`);
+        const response = await fetch(`/api/user/${tgUser.id}/topups?limit=20`, {
+          headers: { ...getTelegramInitDataHeaders() },
+          cache: "no-store",
+        });
         const data = await response.json();
 
         if (data.ok && data.data) {
@@ -72,7 +76,10 @@ export function AccountStep({
     const loadUserPromoInfo = async () => {
       try {
         setLoadingPromoInfo(true);
-        const response = await fetch(`/api/user/${tgUser.id}/promo`);
+        const response = await fetch(`/api/user/${tgUser.id}/promo`, {
+          headers: { ...getTelegramInitDataHeaders() },
+          cache: "no-store",
+        });
         const data = await response.json();
 
         if (data.ok && data.data) {
@@ -160,7 +167,10 @@ export function AccountStep({
         
         // Перезагружаем информацию о промокоде пользователя
         if (tgUser) {
-          const response = await fetch(`/api/user/${tgUser.id}/promo`);
+          const response = await fetch(`/api/user/${tgUser.id}/promo`, {
+            headers: { ...getTelegramInitDataHeaders() },
+            cache: "no-store",
+          });
           const data = await response.json();
           if (data.ok && data.data) {
             setUserPromoInfo(data.data);

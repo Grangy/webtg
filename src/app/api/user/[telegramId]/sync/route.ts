@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withTelegramInitData } from "@/lib/server/forwardTelegramInitData";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
 
@@ -22,17 +23,17 @@ export async function GET(
   const { telegramId } = await params;
   const API_SECRET = getApiSecret();
 
-  const headers = {
+  const baseHeaders = withTelegramInitData(request, {
     "X-Webapp-Secret": API_SECRET,
     "Cache-Control": "no-store, no-cache",
-  };
+  });
 
   try {
     // Параллельно получаем баланс, пользователя и подписки
     const [balanceRes, userRes, subsRes] = await Promise.all([
-      fetch(`${API_URL}/user/${telegramId}/balance`, { headers, cache: "no-store" }),
-      fetch(`${API_URL}/user/${telegramId}`, { headers, cache: "no-store" }),
-      fetch(`${API_URL}/user/${telegramId}/subscriptions`, { headers, cache: "no-store" }),
+      fetch(`${API_URL}/user/${telegramId}/balance`, { headers: baseHeaders, cache: "no-store" }),
+      fetch(`${API_URL}/user/${telegramId}`, { headers: baseHeaders, cache: "no-store" }),
+      fetch(`${API_URL}/user/${telegramId}/subscriptions`, { headers: baseHeaders, cache: "no-store" }),
     ]);
 
     const [balanceData, userData, subsData] = await Promise.all([

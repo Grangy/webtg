@@ -10,6 +10,7 @@ import { usePayment } from "@/hooks/usePayment";
 import { formatHappLink } from "@/utils/formatters";
 import { getReferralSource } from "@/lib/referral";
 import { ROUTER_START_PARAM } from "@/lib/constants";
+import { getTelegramInitDataHeaders } from "@/lib/telegramWebApp";
 
 // Components
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -39,7 +40,7 @@ export default function Home() {
   const router = useRouter();
   const { mounted, tgUser, initTelegram } = useTelegram();
   const { user, setUser, loadUserData, syncUserData } = useUserData();
-  const { plans, plansLoading, loadPlans } = usePlans();
+  const { plans, plansLoading, loadPlans, pricingWarning, dismissPricingWarning } = usePlans();
 
   const payment = usePayment({
     tgUser,
@@ -55,14 +56,13 @@ export default function Home() {
   useEffect(() => {
     if (!mounted) return;
 
-    loadPlans();
-
     const init = async () => {
       const telegramUser = await initTelegram();
       try {
         if (typeof window !== "undefined" && sessionStorage.getItem("skip_router_redirect") === "1") {
           sessionStorage.removeItem("skip_router_redirect");
           if (telegramUser) await loadUserData(telegramUser.id.toString());
+          await loadPlans();
           setStep("info");
           return;
         }
@@ -77,6 +77,7 @@ export default function Home() {
       if (telegramUser) {
         await loadUserData(telegramUser.id.toString());
       }
+      await loadPlans();
       setStep("info");
     };
 
@@ -164,6 +165,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          ...getTelegramInitDataHeaders(),
         },
         body: JSON.stringify({
           telegramId: tgUser.id.toString(),
@@ -446,6 +448,12 @@ export default function Home() {
         </div>
 
         <Toast message="Скопировано!" show={copied} />
+        <Toast
+          message={pricingWarning ?? ""}
+          show={!!pricingWarning}
+          variant="warning"
+          onDismiss={dismissPricingWarning}
+        />
       </main>
     </>
   );

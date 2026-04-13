@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withTelegramInitData } from "@/lib/server/forwardTelegramInitData";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
 
@@ -28,9 +29,10 @@ export async function GET(
     console.log("Fetching from API:", apiUrl);
 
     const response = await fetch(apiUrl, {
-      headers: {
+      headers: withTelegramInitData(request, {
         "X-Webapp-Secret": API_SECRET,
-      },
+      }),
+      cache: "no-store",
     });
 
     console.log("API response status:", response.status);

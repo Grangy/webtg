@@ -18,6 +18,12 @@ export interface Plan {
   pricePerMonth: number;
 }
 
+/** Мета ответа персонализированных прайсов (/plans, /topup/presets) */
+export interface PricingMeta {
+  pricingResolvedBy?: string;
+  [key: string]: unknown;
+}
+
 export interface Subscription {
   id: number;
   type: string;

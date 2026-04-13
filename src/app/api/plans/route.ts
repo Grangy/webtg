@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withTelegramInitData } from "@/lib/server/forwardTelegramInitData";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
 
@@ -10,14 +11,16 @@ function getApiSecret(): string {
   return secret;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const API_SECRET = getApiSecret();
+    const headers = withTelegramInitData(request, {
+      "X-Webapp-Secret": API_SECRET,
+    });
+
     const response = await fetch(`${API_URL}/plans`, {
-      headers: {
-        "X-Webapp-Secret": API_SECRET,
-      },
-      next: { revalidate: 3600 },
+      headers,
+      cache: "no-store",
     });
 
     const data = await response.json();
@@ -29,7 +32,7 @@ export async function GET() {
     }
     return NextResponse.json(data, {
       headers: {
-        "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+        "Cache-Control": "private, no-store, no-cache, must-revalidate",
       },
     });
   } catch (error) {

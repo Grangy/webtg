@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withTelegramInitData } from "@/lib/server/forwardTelegramInitData";
 
 const API_URL = process.env.API_URL || "https://grangy.ru/api";
 
@@ -34,10 +35,10 @@ export async function POST(request: NextRequest) {
 
     const response = await fetch(apiUrl, {
       method: "POST",
-      headers: {
+      headers: withTelegramInitData(request, {
         "Content-Type": "application/json",
         "X-Webapp-Secret": API_SECRET,
-      },
+      }),
       body: JSON.stringify(apiBody),
     });
 

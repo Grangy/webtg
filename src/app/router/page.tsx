@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { CDEK_POINTS_URL, REFERRAL_STORAGE_KEY, ROUTER_START_PARAM, SUPPORT_TG_URL } from "@/lib/constants";
+import { getTelegramInitDataHeaders } from "@/lib/telegramWebApp";
 
 /** Сумма к оплате за роутер (акция). */
 const ROUTER_PRICE = 4500;
@@ -37,7 +38,10 @@ export default function RouterPage() {
     try {
       await fetch("/api/router/order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getTelegramInitDataHeaders(),
+        },
         body: JSON.stringify({ initData, address: address.trim() }),
       });
     } catch {
@@ -46,7 +50,10 @@ export default function RouterPage() {
     try {
       const topupRes = await fetch("/api/topup/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getTelegramInitDataHeaders(),
+        },
         body: JSON.stringify({
           telegramId,
           amount: ROUTER_PRICE,

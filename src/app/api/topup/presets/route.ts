@@ -11,30 +11,33 @@ function getApiSecret(): string {
   return secret;
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
-) {
-  const { orderId } = await params;
-
+/** Прокси GET /topup/presets — персональные суммы пополнения (без кэша). */
+export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${API_URL}/topup/${orderId}/status`, {
-      headers: withTelegramInitData(request, {
-        "X-Webapp-Secret": getApiSecret(),
-      }),
+    const API_SECRET = getApiSecret();
+    const headers = withTelegramInitData(request, {
+      "X-Webapp-Secret": API_SECRET,
+    });
+
+    const response = await fetch(`${API_URL}/topup/presets`, {
+      headers,
       cache: "no-store",
     });
 
     const data = await response.json();
     if (!response.ok) {
       return NextResponse.json(
-        data?.message ? data : { ok: false, error: "API_ERROR", message: "Ошибка статуса заказа" },
+        data?.message ? data : { ok: false, error: "API_ERROR", message: "Ошибка загрузки пресетов" },
         { status: response.status }
       );
     }
-    return NextResponse.json(data);
+    return NextResponse.json(data, {
+      headers: {
+        "Cache-Control": "private, no-store, no-cache, must-revalidate",
+      },
+    });
   } catch (error) {
-    console.error("Error fetching topup status:", error);
+    console.error("Error fetching topup presets:", error);
     return NextResponse.json(
       { ok: false, error: "SERVER_ERROR", message: "Ошибка сервера" },
       { status: 500 }

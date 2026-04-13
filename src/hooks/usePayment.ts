@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, Dispatch, SetStateAction } from "react";
 import { Plan, Subscription, UserData, Step, UserAccount } from "@/types";
 import { getStoredReferralSource } from "@/lib/referral";
+import { getTelegramInitDataHeaders } from "@/lib/telegramWebApp";
 
 interface UsePaymentProps {
   tgUser: UserData | null;
@@ -61,7 +62,10 @@ export function usePayment({
       const referralSource = getStoredReferralSource();
       const response = await fetch("/api/subscription/buy", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getTelegramInitDataHeaders(),
+        },
         body: JSON.stringify({
           telegramId: tgUser.id.toString(),
           planId: selectedPlan.id,
@@ -103,7 +107,10 @@ export function usePayment({
 
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/topup/${paymentOrderId}/status`);
+        const response = await fetch(`/api/topup/${paymentOrderId}/status`, {
+          headers: { ...getTelegramInitDataHeaders() },
+          cache: "no-store",
+        });
         const result = await response.json();
 
         if (result.ok && result.data) {
@@ -166,7 +173,10 @@ export function usePayment({
       const referralSource = getStoredReferralSource();
       const response = await fetch("/api/topup/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...getTelegramInitDataHeaders(),
+        },
         body: JSON.stringify({
           telegramId,
           amount: selectedPlan.price,
@@ -225,7 +235,10 @@ export function usePayment({
     setCheckingPayment(true);
 
     try {
-      const response = await fetch(`/api/topup/${orderId}/status`);
+      const response = await fetch(`/api/topup/${orderId}/status`, {
+        headers: { ...getTelegramInitDataHeaders() },
+        cache: "no-store",
+      });
       const result = await response.json();
 
       if (result.ok && result.data) {
