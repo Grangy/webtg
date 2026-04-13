@@ -43,6 +43,9 @@ API.md
 DEPLOY.md
 DEPLOY_SERVER.md
 
+# Локальные доступы (платёжка, панели, ключи) — только у вас на диске
+ACCESS.local.md
+
 # vercel
 .vercel
 
